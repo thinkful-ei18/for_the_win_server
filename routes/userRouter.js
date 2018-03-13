@@ -20,6 +20,7 @@ router.post('/', (req, res, next) => {
 router.put('/draft', (req, res, next) => {
 
   const { id, playerID } = req.body;
+  console.log('REQ.BODY: ', req.body);
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     const err = new Error(`Request path id: (${id}) doesn't exist.`);
