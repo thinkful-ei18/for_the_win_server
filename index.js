@@ -3,8 +3,7 @@
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
-const dotenv = require('dotenv');
-dotenv.config(); // allows the .env variables to be read by the config file
+const dotenv = require('dotenv').config(); // allows the .env variables to be read by the config file
 
 const {PORT, CLIENT_ORIGIN} = require('./config');
 const {dbConnect} = require('./db-mongoose');
@@ -25,7 +24,9 @@ app.use(
   })
 );
 
-app.use('/draft', teamRouter);
+app.use(express.json());
+
+app.use('/user', teamRouter);
 app.use('/api', proxyRouter);
 
 function runServer(port = PORT) {
