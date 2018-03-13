@@ -3,12 +3,12 @@
 const mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 
-const { MONGODB_URI } = require('../config');
+const { DATABASE_URL } = require('../config');
 const User = require('../models/User.model');
 const seedUsers = require('./users.db.json');
 
 
-mongoose.connect(MONGODB_URI)
+mongoose.connect(DATABASE_URL)
   .then(() => mongoose.connection.db.dropDatabase())
   .then(() => {
     return User.insertMany(seedUsers);
