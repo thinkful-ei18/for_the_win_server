@@ -13,3 +13,5 @@ router.put('/', (req, res, next) => {
     .then(team => res.json(team))
     .catch(next);
 });
+
+module.exports = router;
