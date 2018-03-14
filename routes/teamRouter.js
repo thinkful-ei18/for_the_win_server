@@ -6,18 +6,8 @@ const mongoose = require('mongoose');
 
 const User = require('../models/User.model');
 
-/* ========== CREATE A USER ========== */
-router.post('/', (req, res, next) => {
-  const { email, username, password, teamName } = req.body;
-
-  User.create({ email, username, password, teamName })
-    .then(user => res.json(user).status(201))
-    .catch(next);
-});
-
-
 /* ========== ADD TO A USER'S TEAM ========== */
-router.put('/draft', (req, res, next) => {
+router.put('/add', (req, res, next) => {
 
   const { id, player } = req.body;
 
@@ -36,10 +26,16 @@ router.put('/draft', (req, res, next) => {
 
 
 /* ========== REMOVE FROM A USER'S TEAM ========== */
-router.put('/draft/remove', (req, res, next) => {
+router.put('/remove', (req, res, next) => {
 
-  const { id } = req.body;
-  const { playerID } = req.body;
+  const { id, playerID } = req.body;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    const err = new Error(`Request path id: (${id}) doesn't exist.`);
+    err.status = 400;
+    return next(err);
+  }
+
 
   User.findByIdAndUpdate({ _id: id }, {$pull: {team: {playerID: playerID }} }, { new: true })
     .then(user => {

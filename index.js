@@ -7,7 +7,8 @@ const dotenv = require('dotenv').config(); // allows the .env variables to be re
 
 const {PORT, CLIENT_ORIGIN} = require('./config');
 const {dbConnect} = require('./db-mongoose');
-const userRouter = require('./routes/userRouter');
+const registerRouter = require('./routes/registerRouter');
+const teamRouter = require('./routes/teamRouter');
 const proxyRouter = require('./routes/proxyRouter');
 
 const app = express();
@@ -26,7 +27,8 @@ app.use(
 
 app.use(express.json());
 
-app.use('/user', userRouter);
+app.use('/register', registerRouter);
+app.use('/team', teamRouter);
 app.use('/api', proxyRouter);
 
 function runServer(port = PORT) {
