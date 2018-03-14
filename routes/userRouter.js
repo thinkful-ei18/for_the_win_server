@@ -16,7 +16,7 @@ router.post('/', (req, res, next) => {
 });
 
 
-/* ========== UPDATE A USER'S TEAM ========== */
+/* ========== ADD TO A USER'S TEAM ========== */
 router.put('/draft', (req, res, next) => {
 
   const { id, player } = req.body;
@@ -28,6 +28,20 @@ router.put('/draft', (req, res, next) => {
   }
 
   User.findByIdAndUpdate({ _id: id }, { $push: {team: player}}, { new: true })
+    .then(user => {
+      res.json(user);
+    })
+    .catch(next);
+});
+
+
+/* ========== REMOVE FROM A USER'S TEAM ========== */
+router.put('/draft/remove', (req, res, next) => {
+
+  const { id } = req.body;
+  const { playerID } = req.body;
+
+  User.findByIdAndUpdate({ _id: id }, {$pull: {team: {playerID: playerID }} }, { new: true })
     .then(user => {
       res.json(user);
     })
