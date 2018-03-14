@@ -20,7 +20,6 @@ router.post('/', (req, res, next) => {
 router.put('/draft', (req, res, next) => {
 
   const { id, playerID } = req.body;
-  console.log('REQ.BODY: ', req.body);
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     const err = new Error(`Request path id: (${id}) doesn't exist.`);
@@ -29,7 +28,9 @@ router.put('/draft', (req, res, next) => {
   }
 
   User.findByIdAndUpdate({ _id: id }, { $push: {team: playerID}}, { new: true })
-    .then(team => res.json(team))
+    .then(user => {
+      res.json(user);
+    })
     .catch(next);
 });
 
