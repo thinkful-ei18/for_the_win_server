@@ -9,7 +9,7 @@ const userSchema = new Schema ({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   teamName: { type: String, trim: true, required: true },
-  team: [{ type: Number }]
+  team: { type: Array, default: [] }
 });
 
 userSchema.set('toObject', {
