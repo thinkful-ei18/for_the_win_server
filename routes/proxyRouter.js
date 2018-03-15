@@ -5,7 +5,7 @@ const router = express.Router();
 const fetch = require('isomorphic-fetch');
 const btoa = require('btoa');
 
-const { API_ACTIVE_PLAYERS_BASE_URL, API_DAILY_STATS_BASE_URL, API_PASSWORD, API_USERNAME } = require('../config');
+const { API_ACTIVE_PLAYERS_BASE_URL, API_PLAYER_LOGS_BASE_URL, API_PASSWORD, API_USERNAME } = require('../config');
 
 const todayString = () => {
   let today = new Date();
@@ -59,12 +59,13 @@ router.get('/players', (req, res, next) => {
 });
 
 
-/* ========== GET DAILY STATS FROM MY SPORTS FEED ========== */
+/* ========== GET PLAYER STATS FROM MY SPORTS FEED ========== */
 router.get('/stats', (req, res, next) => {
-  const today = todayString();
+  // const today = todayString();
+  // const{playerID} = req.body;
 
   fetch(
-    `${API_DAILY_STATS_BASE_URL}?fordate=20180314&playerstats=2PM,3PM,FTM,REB,AST,STL,BS`, {
+    `${API_PLAYER_LOGS_BASE_URL}?date=since-1-weeks-ago&playerstats=2PM,3PM,FTM,PTS,BS,AST,REB,STL&player=10138`, {
       headers: {
         'Authorization': 'Basic ' + btoa(`${API_USERNAME}:${API_PASSWORD}`)
       }
@@ -77,7 +78,7 @@ router.get('/stats', (req, res, next) => {
       return response.json();
     })
     .then(data => {
-      const stats = data.dailyplayerstats.playerstatsentry.map(obj => ({
+      const stats = data.playergamelogs.gamelogs.map(obj => ({
         firstName: obj.player.FirstName,
         lastName: obj.player.LastName,
         playerID: obj.player.ID,
@@ -89,7 +90,6 @@ router.get('/stats', (req, res, next) => {
         steals: obj.stats.Stl['#text'],
         blocks: obj.stats.Blk['#text'],
       }));
-
       res.json(stats);
     })
     .catch(next);
