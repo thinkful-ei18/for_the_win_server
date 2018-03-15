@@ -6,6 +6,19 @@ const mongoose = require('mongoose');
 
 const User = require('../models/User.model');
 
+
+/* ========== RETRIEVE A USER'S TEAM ========== */
+router.get('/', (req, res, next) => {
+
+  User.find()
+    .then(user => {
+      let team = user[0].team;
+      res.json(team);
+    })
+    .catch(next);
+});
+
+
 /* ========== ADD TO A USER'S TEAM ========== */
 router.put('/add', (req, res, next) => {
 
