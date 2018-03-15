@@ -61,11 +61,10 @@ router.get('/players', (req, res, next) => {
 
 /* ========== GET PLAYER STATS FROM MY SPORTS FEED ========== */
 router.get('/stats', (req, res, next) => {
-  // const today = todayString();
-  // const{playerID} = req.body;
+  const {playerID} = req.query;
 
   fetch(
-    `${API_PLAYER_LOGS_BASE_URL}?date=since-1-weeks-ago&playerstats=2PM,3PM,FTM,PTS,BS,AST,REB,STL&player=10138`, {
+    `${API_PLAYER_LOGS_BASE_URL}?date=since-1-weeks-ago&playerstats=2PM,3PM,FTM,PTS,BS,AST,REB,STL&player=${playerID}`, {
       headers: {
         'Authorization': 'Basic ' + btoa(`${API_USERNAME}:${API_PASSWORD}`)
       }
@@ -78,7 +77,24 @@ router.get('/stats', (req, res, next) => {
       return response.json();
     })
     .then(data => {
-      const stats = data.playergamelogs.gamelogs.map(obj => ({
+   
+      if (data.gamelogs === undefined) {
+        const logs = [{
+          firstName: 'N/A',
+          lastName: 'N/A',
+          playerID: 'N/A',
+          twoPointers: 'N/A',
+          threePointers: 'N/A',
+          freeThrows: 'N/A',
+          rebounds: 'N/A',
+          assists: 'N/A',
+          steals: 'N/A',
+          blocks: 'N/A',
+        }];
+        res.json(logs);
+      }
+
+      const logs = data.playergamelogs.gamelogs.map(obj => ({
         firstName: obj.player.FirstName,
         lastName: obj.player.LastName,
         playerID: obj.player.ID,
@@ -90,7 +106,7 @@ router.get('/stats', (req, res, next) => {
         steals: obj.stats.Stl['#text'],
         blocks: obj.stats.Blk['#text'],
       }));
-      res.json(stats);
+      res.json(logs);
     })
     .catch(next);
 });
