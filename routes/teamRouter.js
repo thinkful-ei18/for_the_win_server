@@ -19,6 +19,13 @@ router.get('/', (req, res, next) => {
 });
 
 
+/* ========== CREATE A USER ========== */
+router.post('/adduser', (req, res, next) => {
+  console.log('BODY: ',req.body);
+  // const {} = req.body;
+
+});
+
 /* ========== ADD TO A USER'S TEAM ========== */
 router.put('/add', (req, res, next) => {
 

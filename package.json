@@ -13,6 +13,7 @@
   "author": "Joe Turner <jturner@thinkful.com>",
   "license": "MIT",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "btoa": "^1.1.2",
     "cors": "^2.8.4",
     "dotenv": "^5.0.1",

@@ -2,6 +2,7 @@
 
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const bcrypt = require('bcryptjs');
 
 const userSchema = new Schema ({
   fullName: { type: String },
@@ -20,6 +21,10 @@ userSchema.set('toObject', {
     delete ret.password;
   }
 });
+
+userSchema.statics.hashPassword = function (password) {
+  return bcrypt.hash(password, 10);
+};
 
 const User = mongoose.model('User', userSchema);
 
