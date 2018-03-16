@@ -5,7 +5,7 @@ const router = express.Router();
 const fetch = require('isomorphic-fetch');
 const btoa = require('btoa');
 
-const { API_ACTIVE_PLAYERS_BASE_URL, API_PLAYER_LOGS_BASE_URL, API_PASSWORD, API_USERNAME } = require('../config');
+const { API_ROSTER_PLAYERS_BASE_URL, API_PLAYER_LOGS_BASE_URL, API_PASSWORD, API_USERNAME } = require('../config');
 
 const todayString = () => {
   let today = new Date();
@@ -29,7 +29,7 @@ router.get('/players', (req, res, next) => {
   const today = todayString();
 
   fetch(
-    `${API_ACTIVE_PLAYERS_BASE_URL}?fordate=${today}&playerstats=none`, {
+    `${API_ROSTER_PLAYERS_BASE_URL}?fordate=${today}`, {
       headers: {
         'Authorization': 'Basic ' + btoa(`${API_USERNAME}:${API_PASSWORD}`),
         'Accept-Encoding': 'gzip'
@@ -43,7 +43,7 @@ router.get('/players', (req, res, next) => {
       return response.json();
     })
     .then(data => {
-      const players = data.activeplayers.playerentry.map(obj => {
+      const players = data.rosterplayers.playerentry.map(obj => {
         let firstName = obj.player.FirstName;
         let lastName = obj.player.LastName;
         let playerID = obj.player.ID;

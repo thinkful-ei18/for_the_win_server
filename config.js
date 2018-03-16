@@ -9,7 +9,7 @@ module.exports = {
 
   TEST_DATABASE_URL: process.env.TEST_DATABASE_URL || 'mongodb://localhost/thinkful-backend-test',
 
-  API_ACTIVE_PLAYERS_BASE_URL: process.env.API_ACTIVE_PLAYERS_BASE_URL,
+  API_ROSTER_PLAYERS_BASE_URL: process.env.API_ROSTER_PLAYERS_BASE_URL,
 
   API_PLAYER_LOGS_BASE_URL: process.env.API_PLAYER_LOGS_BASE_URL,
 
