@@ -61,7 +61,8 @@ router.get('/players', (req, res, next) => {
 
 /* ========== GET PLAYER STATS FROM MY SPORTS FEED ========== */
 router.get('/stats', (req, res, next) => {
-  const {playerID} = req.query;
+  
+  const playerID = req.query.player;
 
   fetch(
     `${API_PLAYER_LOGS_BASE_URL}?date=since-1-weeks-ago&playerstats=2PM,3PM,FTM,PTS,BS,AST,REB,STL&player=${playerID}`, {
@@ -77,8 +78,8 @@ router.get('/stats', (req, res, next) => {
       return response.json();
     })
     .then(data => {
-   
-      if (data.gamelogs === undefined) {
+
+      if (data.playergamelogs.gamelogs === undefined) {
         const logs = [{
           firstName: 'N/A',
           lastName: 'N/A',
@@ -86,27 +87,30 @@ router.get('/stats', (req, res, next) => {
           twoPointers: 'N/A',
           threePointers: 'N/A',
           freeThrows: 'N/A',
+          totalPoints: 'N/A',
           rebounds: 'N/A',
           assists: 'N/A',
           steals: 'N/A',
           blocks: 'N/A',
         }];
         res.json(logs);
+      } else {
+        const logs = data.playergamelogs.gamelogs.map(obj => ({
+          firstName: obj.player.FirstName,
+          lastName: obj.player.LastName,
+          playerID: obj.player.ID,
+          twoPointers: obj.stats.Fg2PtMade['#text'],
+          threePointers: obj.stats.Fg3PtMade['#text'],
+          freeThrows: obj.stats.FtMade['#text'],
+          totalPoints: obj.stats.Pts['#text'],
+          rebounds: obj.stats.Reb['#text'],
+          assists: obj.stats.Ast['#text'],
+          steals: obj.stats.Stl['#text'],
+          blocks: obj.stats.Blk['#text'],
+        }));
+        res.json(logs);
       }
 
-      const logs = data.playergamelogs.gamelogs.map(obj => ({
-        firstName: obj.player.FirstName,
-        lastName: obj.player.LastName,
-        playerID: obj.player.ID,
-        twoPointers: obj.stats.Fg2PtMade['#text'],
-        threePointers: obj.stats.Fg3PtMade['#text'],
-        freeThrows: obj.stats.FtMade['#text'],
-        rebounds: obj.stats.Reb['#text'],
-        assists: obj.stats.Ast['#text'],
-        steals: obj.stats.Stl['#text'],
-        blocks: obj.stats.Blk['#text'],
-      }));
-      res.json(logs);
     })
     .catch(next);
 });
