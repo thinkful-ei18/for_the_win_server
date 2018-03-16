@@ -26,6 +26,16 @@ userSchema.statics.hashPassword = function (password) {
   return bcrypt.hash(password, 10);
 };
 
+userSchema.methods.return = function () {
+  return {
+    id: this.id,
+    fullName: this.fullName,
+    username: this.username,
+    teamName: this.teamName,
+    team: this.team
+  };
+};
+
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;
