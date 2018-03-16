@@ -61,7 +61,7 @@ router.get('/players', (req, res, next) => {
 
 /* ========== GET PLAYER STATS FROM MY SPORTS FEED ========== */
 router.get('/stats', (req, res, next) => {
-  
+
   const playerID = req.query.player;
 
   fetch(
@@ -83,6 +83,7 @@ router.get('/stats', (req, res, next) => {
         const logs = [{
           firstName: 'N/A',
           lastName: 'N/A',
+          dateOfGame: 'N/A',
           playerID: 'N/A',
           twoPointers: 'N/A',
           threePointers: 'N/A',
@@ -98,6 +99,7 @@ router.get('/stats', (req, res, next) => {
         const logs = data.playergamelogs.gamelogs.map(obj => ({
           firstName: obj.player.FirstName,
           lastName: obj.player.LastName,
+          dateOfGame: obj.game.date,
           playerID: obj.player.ID,
           twoPointers: obj.stats.Fg2PtMade['#text'],
           threePointers: obj.stats.Fg3PtMade['#text'],
