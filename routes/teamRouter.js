@@ -21,11 +21,10 @@ router.get('/', (req, res, next) => {
 
 /* ========== CREATE A USER ========== */
 router.post('/adduser', (req, res, next) => {
-  console.log('BODY: ',req.body);
+  
   /* ===== verify all required props are present ===== */
   const requiredProps = ['email', 'username', 'password', 'teamName'];
   const missingProp = requiredProps.find(prop => !(prop in req.body));
-  console.log('MISS PROPS: ', missingProp);
 
   if (missingProp) {
     const err = new Error(`Please fill out the '${missingProp}' section.`);
