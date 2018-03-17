@@ -17,5 +17,6 @@ module.exports = {
 
   API_USERNAME: process.env.SPORTS_FEED_UN,
 
-  API_PASSWORD: process.env.SPORTS_FEED_PW
+  API_PASSWORD: process.env.SPORTS_FEED_PW,
+
 };

@@ -4,12 +4,16 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const dotenv = require('dotenv').config(); // allows the .env variables to be read by the config file
+const passport = require('passport');
+const localStrategy = require('./passport/local');
+const jwtStrategy = require('./passport/jwt');
 
 const {PORT, CLIENT_ORIGIN} = require('./config');
 const {dbConnect} = require('./db-mongoose');
 const registerRouter = require('./routes/registerRouter');
 const teamRouter = require('./routes/teamRouter');
 const proxyRouter = require('./routes/proxyRouter');
+const authRouter = require('./routes/authRouter');
 
 const app = express();
 
@@ -26,12 +30,22 @@ app.use(
 );
 
 
-/* ===== middleware ===== */
+/* ===== middleware for decoding the request body ===== */
 app.use(express.json());
 
+/* ===== middleware for authenticating with passport ===== */
+passport.use(localStrategy);
+passport.use(jwtStrategy);
 
-/* ===== routes ===== */
+
+/* ===== endpoints that don't need authorization ===== */
 app.use('/register', registerRouter);
+app.use('/authorize', authRouter);
+
+/* ===== authorization ===== */
+app.use(passport.authenticate('jwt', { session: false, failWithError: true }));
+
+/* ===== endpoints that need authorization ===== */
 app.use('/team', teamRouter);
 app.use('/api', proxyRouter);
 
