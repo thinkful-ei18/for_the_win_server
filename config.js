@@ -19,4 +19,5 @@ module.exports = {
 
   API_PASSWORD: process.env.SPORTS_FEED_PW,
 
+  JWT_SECRET: process.env.JWT_SECRET,
 };

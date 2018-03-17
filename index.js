@@ -9,7 +9,8 @@ const passport = require('passport'); // authentication middleware
 
 const {PORT, CLIENT_ORIGIN} = require('./config');
 const {dbConnect} = require('./db-mongoose');
-const localStrategy = require('./passport/local'); // strategy for authenticating with a un and pw.
+const localStrategy = require('./passport/localStrategy'); // strategy for authenticating with a un and pw.
+const jwtStrategy = require('./passport/jwtStrategy'); // strategy for authenticating with jwt's.
 
 const registerRouter = require('./routes/registerRouter');
 const teamRouter = require('./routes/teamRouter');
@@ -40,12 +41,15 @@ app.use(express.json());
 
 /* ===== middleware for authenticating with passport ===== */
 passport.use(localStrategy);
+passport.use(jwtStrategy);
 
 
 /* ===== endpoints that don't need authorization ===== */
 app.use('/register', registerRouter);
 app.use('/authorize', authRouter);
 
+/* ===== define authorization to be used with all endpoint below this point===== */
+app.use(passport.authenticate('jwt', { session: false, failWithError: true }));
 
 /* ===== endpoints that need authorization ===== */
 app.use('/team', teamRouter);
@@ -93,5 +97,6 @@ module.exports = {app};
  - express: http://expressjs.com/en/api.html
  - morgan: https://github.com/expressjs/morgan
  - passport: http://www.passportjs.org/
+ - passport.authenticate: https://github.com/themikenicholson/passport-jwt
 
  */
