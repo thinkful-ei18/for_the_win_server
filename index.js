@@ -1,49 +1,51 @@
 'use strict';
 
-const express = require('express');
-const cors = require('cors');
-const morgan = require('morgan');
+/* ===== required library's/files ===== */
+const express = require('express'); // node.js web application framework
+const cors = require('cors'); // allows the client and server to speak to each other
+const morgan = require('morgan'); // HTTP request logger middleware for node.js
 const dotenv = require('dotenv').config(); // allows the .env variables to be read by the config file
-const passport = require('passport');
-const localStrategy = require('./passport/local');
-const jwtStrategy = require('./passport/jwt');
+const passport = require('passport'); // authentication middleware
 
 const {PORT, CLIENT_ORIGIN} = require('./config');
 const {dbConnect} = require('./db-mongoose');
+const localStrategy = require('./passport/local'); // strategy for authenticating with a un and pw.
+
 const registerRouter = require('./routes/registerRouter');
 const teamRouter = require('./routes/teamRouter');
 const proxyRouter = require('./routes/proxyRouter');
 const authRouter = require('./routes/authRouter');
 
+
+/* ===== use express ===== */
 const app = express();
 
+
+/* ===== how to use morgan based upon the current environment ===== */
 app.use(
   morgan(process.env.NODE_ENV === 'production' ? 'common' : 'dev', {
     skip: (req, res) => process.env.NODE_ENV === 'test'
   })
 );
 
+/* ===== allow the clients domain to access the server info ===== */
 app.use(
   cors({
     origin: CLIENT_ORIGIN
   })
 );
 
-
-/* ===== middleware for decoding the request body ===== */
+/* ===== built in express middleware for decoding the request body ===== */
 app.use(express.json());
 
 /* ===== middleware for authenticating with passport ===== */
 passport.use(localStrategy);
-passport.use(jwtStrategy);
 
 
 /* ===== endpoints that don't need authorization ===== */
 app.use('/register', registerRouter);
 app.use('/authorize', authRouter);
 
-/* ===== authorization ===== */
-app.use(passport.authenticate('jwt', { session: false, failWithError: true }));
 
 /* ===== endpoints that need authorization ===== */
 app.use('/team', teamRouter);
@@ -84,3 +86,12 @@ if (require.main === module) {
 }
 
 module.exports = {app};
+
+
+/**
+ Resources:
+ - express: http://expressjs.com/en/api.html
+ - morgan: https://github.com/expressjs/morgan
+ - passport: http://www.passportjs.org/
+
+ */
