@@ -20,4 +20,6 @@ module.exports = {
   API_PASSWORD: process.env.SPORTS_FEED_PW,
 
   JWT_SECRET: process.env.JWT_SECRET,
+
+  JWT_EXPIRY: process.env.JWT_EXPIRY || '3d'
 };

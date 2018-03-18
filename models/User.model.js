@@ -22,10 +22,6 @@ userSchema.set('toObject', {
   }
 });
 
-userSchema.statics.hashPassword = function (password) {
-  return bcrypt.hash(password, 10);
-};
-
 userSchema.methods.return = function () {
   return {
     id: this.id,
@@ -34,6 +30,14 @@ userSchema.methods.return = function () {
     teamName: this.teamName,
     team: this.team
   };
+};
+
+userSchema.statics.hashPassword = function (password) {
+  return bcrypt.hash(password, 10);
+};
+
+userSchema.methods.validatePassword = function (password) {
+  return bcrypt.compare(password, this.password);
 };
 
 const User = mongoose.model('User', userSchema);

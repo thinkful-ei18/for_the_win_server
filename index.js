@@ -15,7 +15,7 @@ const jwtStrategy = require('./passport/jwtStrategy'); // strategy for authentic
 const registerRouter = require('./routes/registerRouter');
 const teamRouter = require('./routes/teamRouter');
 const proxyRouter = require('./routes/proxyRouter');
-const authRouter = require('./routes/authRouter');
+const loginRouter = require('./routes/loginRouter');
 
 
 /* ===== use express ===== */
@@ -46,10 +46,10 @@ passport.use(jwtStrategy);
 
 /* ===== endpoints that don't need authorization ===== */
 app.use('/register', registerRouter);
-app.use('/authorize', authRouter);
+app.use('/login', loginRouter);
 
-/* ===== define authorization to be used with all endpoint below this point===== */
-app.use(passport.authenticate('jwt', { session: false, failWithError: true }));
+/* ===== define authorization to be used with all endpoints below this point===== */
+app.use(passport.authenticate('jwtStrategy', { session: false, failWithError: true }));
 
 /* ===== endpoints that need authorization ===== */
 app.use('/team', teamRouter);

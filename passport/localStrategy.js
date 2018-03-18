@@ -6,10 +6,9 @@ const User = require('../models/User.model');
 
 const localStrategy = new LocalStrategy(
   { usernameField: 'email', passwordField: 'password',},
-  (username, password, done) => {
-
+  (email, password, done) => {
     let user;
-    User.findOne({ username })
+    User.findOne({ email })
       .then(result => {
         user = result;
         if (!user) {
@@ -32,10 +31,6 @@ const localStrategy = new LocalStrategy(
         return done(null, user);
       })
       .catch(err => {
-        if (err.reason === 'LoginError') {
-          return done(null, false);
-        }
-
         return done(err);
       });
   });
@@ -45,4 +40,5 @@ module.exports = localStrategy;
 /**
  Resources:
  https://github.com/jaredhanson/passport-local
+ http://www.passportjs.org/docs/username-password/
  */
