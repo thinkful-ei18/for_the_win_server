@@ -44,14 +44,9 @@ passport.use(localStrategy);
 passport.use(jwtStrategy);
 
 
-/* ===== endpoints that don't need authorization ===== */
+/* ===== endpoints ===== */
 app.use('/register', registerRouter);
 app.use('/login', loginRouter);
-
-/* ===== define authorization to be used with all endpoints below this point===== */
-app.use(passport.authenticate('jwtStrategy', { session: false, failWithError: true }));
-
-/* ===== endpoints that need authorization ===== */
 app.use('/team', teamRouter);
 app.use('/api', proxyRouter);
 

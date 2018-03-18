@@ -5,7 +5,7 @@ const { JWT_SECRET } = require('../config.js');
 
 
 const options = {
-  jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme('Bearer'),
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
   secretOrKey: JWT_SECRET,
   algorithms: ['HS256']
 };
