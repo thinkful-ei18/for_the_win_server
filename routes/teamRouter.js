@@ -27,16 +27,11 @@ router.get('/', jwtAuth, (req, res, next) => {
 router.put('/add', jwtAuth, (req, res, next) => {
   
   const userId = req.user.id;
-  const { id, player } = req.body;
-
-  console.log('UID: ', userId);
-  console.log('ID: ', id);
-  console.log('PLAYER: ', player);
-
+  const { playerID, firstName, lastName } = req.body;
+  const player = { playerID, firstName, lastName };
 
   User.findByIdAndUpdate({ _id: userId }, { $push: {team: player}}, { new: true })
     .then(user => {
-      console.log('USER: ', user);
       res.json(user);
     })
     .catch(next);
