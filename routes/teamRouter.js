@@ -2,7 +2,6 @@
 
 const express = require('express');
 const router = express.Router();
-const mongoose = require('mongoose');
 const passport = require('passport');
 
 const User = require('../models/User.model');
@@ -13,6 +12,7 @@ const jwtAuth = passport.authenticate('jwt', options);
 
 /* ========== RETRIEVE A USER'S TEAM ========== */
 router.get('/', jwtAuth, (req, res, next) => {
+  
   const userId = req.user.id;
 
   User.findById(userId)
@@ -42,16 +42,9 @@ router.put('/add', jwtAuth, (req, res, next) => {
 router.put('/remove', jwtAuth, (req, res, next) => {
 
   const userId = req.user.id;
-  const { id, playerID } = req.body;
+  const { playerID } = req.body;
 
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    const err = new Error(`Request path id: (${id}) doesn't exist.`);
-    err.status = 400;
-    return next(err);
-  }
-
-
-  User.findByIdAndUpdate({ _id: id }, {$pull: {team: {playerID: playerID }} }, { new: true })
+  User.findByIdAndUpdate({ _id: userId }, {$pull: {team: {playerID }} }, { new: true })
     .then(user => {
       res.json(user);
     })
