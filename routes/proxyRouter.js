@@ -84,7 +84,7 @@ router.get('/stats', (req, res, next) => {
           firstName: 'N/A',
           lastName: 'N/A',
           dateOfGame: 'N/A',
-          playerID: 'N/A',
+          playerID: playerID,
           twoPointers: 'N/A',
           threePointers: 'N/A',
           freeThrows: 'N/A',
