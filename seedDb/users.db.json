@@ -1,9 +1,123 @@
-{
-  "_id": "555555555555555555555555",
-  "fullName": "Stephen Curry",
-  "email": "stephencurry@gmail.com",
-  "username": "steph30",
-  "password": "dubnation",
-  "teamName": "warriors",
-  "team": []
-}
+[
+  {
+    "_id": "555555555555555555555555",
+    "fullName": "Stephen Curry",
+    "email": "stephen@gmail.com",
+    "username": "stephen30",
+    "password": "dubnation",
+    "teamName": "three-peat",
+    "team": [
+      { 
+        "firstName": "Giannis",
+        "lastName": "Antetokounmpo",
+        "playerID": "9325" 
+      },
+      {
+        "firstName": "Quinn",
+        "lastName": "Cook",
+        "playerID": "11981"
+      },
+      {
+        "firstName": "Harrison",
+        "lastName": "Barnes",
+        "playerID": "9220"
+      },
+      {
+        "firstName": "Clint",
+        "lastName": "Capela",
+        "playerID": "9237"
+      },
+      {
+        "firstName": "Anthony",
+        "lastName": "Davis",
+        "playerID": "9354"
+      },
+      {
+        "firstName": "James",
+        "lastName": "Harden",
+        "playerID": "9232"
+      },
+      {
+        "firstName": "Kyrie",
+        "lastName": "Irving",
+        "playerID": "9157"
+      },
+      {
+        "firstName": "LeBron",
+        "lastName": "James",
+        "playerID": "9158"
+      },
+      {
+        "firstName": "Jayson",
+        "lastName": "Tatum",
+        "playerID": "13730"
+      },
+      {
+        "firstName": "Ben",
+        "lastName": "Simmons",
+        "playerID": "10087"
+      }
+    ]
+  },
+
+  {
+    "_id": "111111111111111111111111",
+    "fullName": "Klay Thompson",
+    "email": "klay@gmail.com",
+    "username": "klay11",
+    "password": "dubnation",
+    "teamName": "three-peat",
+    "team": [
+      {
+        "firstName": "Giannis",
+        "lastName": "Antetokounmpo",
+        "playerID": "9325"
+      },
+      {
+        "firstName": "Quinn",
+        "lastName": "Cook",
+        "playerID": "11981"
+      },
+      {
+        "firstName": "Harrison",
+        "lastName": "Barnes",
+        "playerID": "9220"
+      },
+      {
+        "firstName": "Clint",
+        "lastName": "Capela",
+        "playerID": "9237"
+      },
+      {
+        "firstName": "Anthony",
+        "lastName": "Davis",
+        "playerID": "9354"
+      },
+      {
+        "firstName": "James",
+        "lastName": "Harden",
+        "playerID": "9232"
+      },
+      {
+        "firstName": "Kyrie",
+        "lastName": "Irving",
+        "playerID": "9157"
+      },
+      {
+        "firstName": "LeBron",
+        "lastName": "James",
+        "playerID": "9158"
+      },
+      {
+        "firstName": "Jayson",
+        "lastName": "Tatum",
+        "playerID": "13730"
+      },
+      {
+        "firstName": "Ben",
+        "lastName": "Simmons",
+        "playerID": "10087"
+      }
+    ]
+  }
+]
