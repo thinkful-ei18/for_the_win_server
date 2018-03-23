@@ -4,7 +4,7 @@
     "fullName": "Stephen Curry",
     "email": "stephen@gmail.com",
     "username": "stephen30",
-    "password": "dubnation",
+    "password": "$2a$10$EL8KXas25Z7noCTkfyRcQeXWmEBa7ChzGZXBWSw4OINcV5.wpwAR2",
     "teamName": "three-peat",
     "team": [
       { 
@@ -65,7 +65,7 @@
     "fullName": "Klay Thompson",
     "email": "klay@gmail.com",
     "username": "klay11",
-    "password": "dubnation",
+    "password": "$2a$10$EL8KXas25Z7noCTkfyRcQeXWmEBa7ChzGZXBWSw4OINcV5.wpwAR2",
     "teamName": "three-peat",
     "team": [
       {
