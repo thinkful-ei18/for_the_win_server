@@ -21,7 +21,7 @@
 
 
 ## File locations
-  - The maing page can be found at `./index.js`. 
+  - The main page can be found at `./index.js`. 
   - All routes can be found in `./routes`.
   - Authentication middleware can be found in `./passport`.
 
