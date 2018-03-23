@@ -9,7 +9,7 @@
 
 
 ## Link to deployed version
-  https://for-the-win-app.netlify.com/
+  https://for-the-win-app.herokuapp.com/
 
 
 ## Tech Stack
