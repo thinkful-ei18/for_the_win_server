@@ -21,6 +21,12 @@ before(function () {
   return dbConnect(TEST_DATABASE_URL);
 });
 
+beforeEach(function () { });
+
+afterEach(function () {
+  return User.remove();
+});
+
 after(function () {
   return dbDisconnect();
 });
@@ -28,7 +34,7 @@ after(function () {
 
 
 /* ========== ROUTE TESTS ========== */
-describe('tests for registerRouter: /register', () => {
+describe('tests for registerRouter at endpoint /register:', () => {
 
   describe('verify the required fields are present in the req.body', () => {
     const email = 'stephen@gmail.com';
@@ -160,49 +166,49 @@ describe('tests for registerRouter: /register', () => {
   });
 
 
-  // describe('user creation', () => {
-  //   const email = 'stephen@gmail.com';
-  //   const username = 'steph30';
-  //   const password = 'dubnation';
-  //   const teamName = 'three-peat';
+  describe.only('when registering a user it: ', () => {
+    // if a seeded user is used here the "user.create" portion of the test has to be removed because that user already exists and it only needs to be tried to be made 1 more time, not 2 more times.
+    const email = 'kevin@gmail.com';
+    const username = 'kevin35';
+    const password = 'dubnation';
+    const teamName = 'three-peat';
 
-  //   it('should fail if the username already exists', () => {
-  //     return User.create({ email, username, password, teamName })
-  //       .then(() => {
-  //         return chai.request(app)
-  //           .post('/register')
-  //           .send({ email, username, password, teamName });
-  //       })
-  //       .then(res => {
-  //         expect(res).to.not.exist;
-  //       })
-  //       .catch(err => {
-  //         // const res = err.response;
-  //         console.log('ERR: ', err);
-  //         expect(err.body.message).to.equal('The username already exists');
-  //       });
-  //   });
+    it('should fail if the username already exists', () => {
+      return User.create({ email, username, password, teamName })
+        .then(() => {
+          return chai.request(app)
+            .post('/register')
+            .send({ email, username, password, teamName });
+        })
+        .then(res => {
+          expect(res).to.not.exist;
+        })
+        .catch(err => {
+          const res = err.response;
+          expect(res.body.message).to.equal('The username already exists');
+        });
+    });
 
-  //   it('should create a new user and make sure the pw is hashed', () => {
-  //     return chai.request(app)
-  //       .post('/register')
-  //       .send({ username, password })
-  //       .then(res => {
-  //         expect(res).to.have.status(201);
-  //         expect(res.body).to.be.an('object');
-  //         expect(res.body).to.have.keys('id', 'fullname', 'username', 'teamName', 'team');
-  //         expect(res.body.username).to.equal(username);
-  //         return User.findOne({ username: username });
-  //       })
-  //       .then(user => {
-  //         expect(user).to.not.be.null;
-  //         return user.validatePassword(password);
-  //       })
-  //       .then(result => {
-  //         expect(result).to.be.true;
-  //       });
-  //   });
-  // });
+    it('should create a new user and make sure the pw is hashed', () => {
+      return chai.request(app)
+        .post('/register')
+        .send({ email, username, password, teamName })
+        .then(res => {
+          expect(res).to.have.status(201);
+          expect(res.body).to.be.an('object');
+          expect(res.body).to.have.keys('id', 'fullName', 'username', 'teamName', 'team');
+          expect(res.body.username).to.equal(username);
+          return User.findOne({ username: username });
+        })
+        .then(user => {
+          expect(user).to.not.be.null;
+          return user.validatePassword(password);
+        })
+        .then(result => {
+          expect(result).to.be.true;
+        });
+    });
+  });
 
 
 });
