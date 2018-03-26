@@ -43,17 +43,22 @@ router.get('/players', (req, res, next) => {
       return response.json();
     })
     .then(data => {
-      const players = data.rosterplayers.playerentry.map(obj => {
-        let firstName = obj.player.FirstName;
-        let lastName = obj.player.LastName;
-        let playerID = obj.player.ID;
+      const currentlySignedPlayers = data.rosterplayers.playerentry.filter(obj => obj.team !== undefined);
+
+      const selectablePlayers = currentlySignedPlayers.map(obj => {
+        const firstName = obj.player.FirstName;
+        const lastName = obj.player.LastName;
+        const playerID = obj.player.ID;
+        const playerTeam = `${obj.team.City} ${obj.team.Name}`;
         return {
           playerID,
           firstName,
-          lastName
+          lastName,
+          playerTeam
         };
       });
-      res.json(players);
+
+      res.json(selectablePlayers);
     })
     .catch(next);
 });
