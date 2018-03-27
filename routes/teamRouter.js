@@ -27,8 +27,8 @@ router.get('/', jwtAuth, (req, res, next) => {
 router.put('/add', jwtAuth, (req, res, next) => {
   
   const userId = req.user.id;
-  const { playerID, firstName, lastName } = req.body;
-  const player = { playerID, firstName, lastName };
+  const { playerID, firstName, lastName, playerTeam } = req.body;
+  const player = { playerID, firstName, lastName, playerTeam };
 
   User.findByIdAndUpdate({ _id: userId }, { $push: {team: player}}, { new: true })
     .then(user => {
