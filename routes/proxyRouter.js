@@ -5,7 +5,7 @@ const router = express.Router();
 const fetch = require('isomorphic-fetch');
 const btoa = require('btoa');
 
-const { API_ROSTER_PLAYERS_BASE_URL, API_PLAYER_LOGS_BASE_URL, API_PASSWORD, API_USERNAME } = require('../config');
+const { API_ROSTER_PLAYERS_BASE_URL, API_PLAYER_LOGS_BASE_URL, API_DAILY_GAME_SCHEDULE_BASE_URL, API_PASSWORD, API_USERNAME } = require('../config');
 
 const todayString = () => {
   let today = new Date();
@@ -120,6 +120,37 @@ router.get('/stats', (req, res, next) => {
 
     })
     .catch(next);
+});
+
+
+/* ========== GET DAILY GAME SCHEDULE FROM MY SPORTS FEED ========== */
+
+router.get('/games', (req, res, next) => {
+  const today = todayString();
+
+  fetch(`${API_DAILY_GAME_SCHEDULE_BASE_URL}?fordate=${today}`, {
+    headers: {
+      'Authorization': 'Basic ' + btoa(`${API_USERNAME}:${API_PASSWORD}`)
+    }
+  })
+    .then(response => {
+      if (!response.ok) {
+        return Promise.reject(response.statusText);
+      }
+      return response.json();
+    })
+    .then(data => {
+      const games = data.dailygameschedule.gameentry.map( obj => ({
+        gameDate: obj.date,
+        gameTime: obj.time,
+        awayTeam: `${obj.awayTeam.City} ${obj.awayTeam.Name}`,
+        homeTeam: `${obj.homeTeam.City} ${obj.homeTeam.Name}`
+      }));
+
+      res.json(games);
+    })
+    .catch(next);
+
 });
 
 
