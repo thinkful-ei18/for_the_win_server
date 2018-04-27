@@ -1,7 +1,7 @@
 # For The Win
 The basketball enthusiast's preferred way to track stats for their favorite players.
 
-- [Link to server repo](#server-repo)
+- [Link to client repo](#client-repo)
 - [Link to deployed version](#deployed-version)
 - [Tech Stack](#tech-stack)
 - [Screenshots](#screenshots)
