@@ -16,6 +16,7 @@ const registerRouter = require('./routes/registerRouter');
 const teamRouter = require('./routes/teamRouter');
 const proxyRouter = require('./routes/proxyRouter');
 const loginRouter = require('./routes/loginRouter');
+const leagueRouter = require('./routes/leagueRouter');
 
 
 /* ===== use express ===== */
@@ -49,6 +50,7 @@ app.use('/register', registerRouter);
 app.use('/login', loginRouter);
 app.use('/team', teamRouter);
 app.use('/api', proxyRouter);
+app.use('/league', leagueRouter);
 
 
 /* ===== error handling ===== */
