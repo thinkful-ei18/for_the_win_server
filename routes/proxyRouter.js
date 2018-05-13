@@ -140,13 +140,18 @@ router.get('/games', (req, res, next) => {
       return response.json();
     })
     .then(data => {
-      const games = data.dailygameschedule.gameentry.map( obj => ({
-        gameDate: obj.date,
-        gameTime: obj.time,
-        awayTeam: `${obj.awayTeam.City} ${obj.awayTeam.Name}`,
-        homeTeam: `${obj.homeTeam.City} ${obj.homeTeam.Name}`
-      }));
-
+      let games;
+      if(data.dailygameschedule.gameentry) {
+        games = data.dailygameschedule.gameentry.map( obj => ({
+          gameDate: obj.date,
+          gameTime: obj.time,
+          awayTeam: `${obj.awayTeam.City} ${obj.awayTeam.Name}`,
+          homeTeam: `${obj.homeTeam.City} ${obj.homeTeam.Name}`
+        }));
+      }
+      else {
+        games = false;
+      }
       res.json(games);
     })
     .catch(next);
