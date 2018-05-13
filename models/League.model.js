@@ -3,15 +3,54 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const League = new Schema({
+const leagueSchema = new Schema({
   name: {
-    type: String
+    type: String,
+    required: true,
+    unique: true,
+    trim: true
+  },
+  users: {
+    type: Array,
+    required: true,
+    unique: true
   },
   players: {
-    type: Array
+    type: Array,
+    required: true,
+    unique: true,
+    default: []
   }
 });
 
+
+leagueSchema.set('toObject', {
+  transform: function (doc, ret) {
+    ret.id = ret._id;
+    delete ret._id;
+    delete ret.__v;
+    delete ret.password;
+  }
+});
+  
+// what will show on screen when you do a res.json()
+leagueSchema.methods.return = function () {
+  return {
+    id: this.id,
+    name: this.name,
+    users: this.users,
+    players: this.players
+  };
+};
+
+// how to access the collection
+const League = mongoose.model('League', leagueSchema);
+
+module.exports = League;
+
+
 /**
- * when a user joins the league and adds a player, that player gets added to the players prop
+ - name of league (string)
+ - users in league (array of id's from bearer token)
+ - prop with all players across all members in league (array)
  */
