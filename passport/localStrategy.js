@@ -14,8 +14,8 @@ const localStrategy = new LocalStrategy(
         if (!user) {
           return Promise.reject({
             reason: 'LoginError',
-            message: 'Incorrect username',
-            location: 'username',
+            message: 'Incorrect email',
+            location: 'email',
             status: 401
           });
         }
