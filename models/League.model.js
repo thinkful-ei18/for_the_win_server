@@ -13,12 +13,10 @@ const leagueSchema = new Schema({
   users: {
     type: Array,
     required: true,
-    unique: true
   },
   players: {
     type: Array,
     required: true,
-    unique: true,
     default: []
   }
 });
