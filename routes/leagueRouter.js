@@ -13,10 +13,26 @@ const jwtAuth = passport.authenticate('jwt', options);
 router.get('/', jwtAuth, (req, res, next) => {
 
   League.find({})
-    .then( league => res.json(league))
+    .then( leagues => {
+      const sendToUser = leagues.map(league => league.return());
+      res.json(sendToUser);
+    })
     .catch(err => next(err));
   
 });
+
+/* ========== RETRIEVE USER'S LEAGUE ========== */
+router.get('/', jwtAuth, (req, res, next) => {
+
+  // get userId
+  // search users array within each league to see if this user's id is in there
+  // if so, return that league
+  
+  // const userId = req.user.id;
+
+  
+});
+
 
 
 /* ========== CREATE A LEAGUE ========== */
@@ -30,9 +46,9 @@ router.post('/add', jwtAuth, (req, res, next) => {
     .then( number => {
       if (number >= 1) {
         return Promise.reject({
-          code: 422,
-          reason: 'ValidationError',
-          message: 'League already taken',
+          status: 422,
+          reason: 'Validation Error',
+          message: `The league "${name}" already exists.`,
           location: 'name'
         });
       }
@@ -43,7 +59,7 @@ router.post('/add', jwtAuth, (req, res, next) => {
       });
     })
     .then(league => {
-      return res.status(201).location(`${req.originalUrl}/${league.id}`).json(league);
+      return res.status(201).location(`${req.originalUrl}/${league.id}`).json(league.return());
     })
     .catch(err => {
       if (err.code === 11000) {
@@ -66,18 +82,22 @@ router.put('/join', jwtAuth, (req, res, next) => {
       const verify = league[0].users.filter(player => player === userId); 
 
       if (verify.length < 1) {
-        if(league[0].users.length <= 4) {
-          league[0].users.push(userId);
 
-          return League.findOneAndUpdate({name}, {users: league[0].users}, {returnNewDocument: true});
+        if(league[0].users.length <= 4) {
+          return League.findOneAndUpdate(
+            { name }, 
+            { $push: {users: userId} }, 
+            { new: true }
+          );
         }
         else {
           let err = new Error('That league is full, please select or create another');
-          err.status = 400;
+          err.status = 422;
 
           throw err;
         }
       }
+      
       else {
         let err = new Error('You are already in this league!');
         err.status = 422;
