@@ -27,14 +27,12 @@ leagueSchema.set('toObject', {
     ret.id = ret._id;
     delete ret._id;
     delete ret.__v;
-    delete ret.password;
   }
 });
   
 // what will show on screen when you do a res.json()
 leagueSchema.methods.return = function () {
   return {
-    id: this.id,
     name: this.name,
     users: this.users,
     players: this.players
