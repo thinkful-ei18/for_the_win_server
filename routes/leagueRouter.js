@@ -13,6 +13,7 @@ const jwtAuth = passport.authenticate('jwt', options);
 router.get('/', jwtAuth, (req, res, next) => {
 
   League.find({})
+    .sort({ name: 1 })
     .then( leagues => {
       const sendToUser = leagues.map(league => league.return());
       res.json(sendToUser);
