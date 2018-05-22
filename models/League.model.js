@@ -12,12 +12,7 @@ const leagueSchema = new Schema({
   },
   users: {
     type: Array,
-    required: true,
-  },
-  players: {
-    type: Array,
-    required: true,
-    default: []
+    required: true
   }
 });
 
@@ -46,7 +41,11 @@ module.exports = League;
 
 
 /**
- - name of league (string)
- - users in league (array of id's from bearer token)
- - prop with all players across all members in league (array)
+Extension feature:
+ - add "players" prop so only 1 member of each league can have each player.
+  players: {
+    type: Array,
+    required: true,
+    default: []
+  }
  */
