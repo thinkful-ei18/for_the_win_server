@@ -7,8 +7,8 @@ const morgan = require('morgan'); // HTTP request logger middleware for node.js
 const dotenv = require('dotenv').config(); // allows the .env variables to be read by the config file
 const passport = require('passport'); // authentication middleware
 
-const {PORT, CLIENT_ORIGIN} = require('./config');
-const {dbConnect} = require('./db-mongoose');
+const { PORT, CLIENT_ORIGIN } = require('./config');
+const { dbConnect } = require('./db-mongoose');
 const localStrategy = require('./passport/localStrategy'); // strategy for authenticating with a un and pw.
 const jwtStrategy = require('./passport/jwtStrategy'); // strategy for authenticating with jwt's.
 
@@ -69,7 +69,7 @@ app.use(function (err, req, res, next) {
 });
 
 
-
+/* ===== code that "nodemon" runs ===== */
 function runServer(port = PORT) {
   const server = app
     .listen(port, () => {
