@@ -40,7 +40,7 @@ router.get('/', jwtAuth, (req, res, next) => {
 router.post('/add', jwtAuth, (req, res, next) => {
   
   const userId = req.user.id;
-  const { name } = req.body;
+  let { name } = req.body;
 
   League.find({name})
     .count()
@@ -55,7 +55,7 @@ router.post('/add', jwtAuth, (req, res, next) => {
       }
 
       return League.create({
-        name,
+        name: name.toLowerCase(),
         users: [ userId ]
       });
     })
