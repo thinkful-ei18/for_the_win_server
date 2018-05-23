@@ -39,7 +39,7 @@ router.get('/', jwtAuth, (req, res, next) => {
 /* ========== CREATE A LEAGUE ========== */
 router.post('/add', jwtAuth, (req, res, next) => {
   
-  const userId = req.user.id;
+  const user = req.user;
   let { name } = req.body;
 
   League.find({name})
@@ -56,7 +56,11 @@ router.post('/add', jwtAuth, (req, res, next) => {
 
       return League.create({
         name: name.toLowerCase(),
-        users: [ userId ]
+        users: [{ 
+          userId: user.id,
+          username: user.username,
+          team: user.teamName
+        }]
       });
     })
     .then(league => {
@@ -75,19 +79,25 @@ router.post('/add', jwtAuth, (req, res, next) => {
 
 /* ========== JOIN A LEAGUE ========== */
 router.put('/join', jwtAuth, (req, res, next) => {
-  const userId = req.user.id;
+  const user = req.user;
   const { name } = req.body;
 
-  League.find({name})
+  League.find({name: name.toLowerCase()})
     .then(league => {
-      const verify = league[0].users.filter(player => player === userId); 
+      const verify = league[0].users.filter(obj => obj.userId === user.id); 
 
       if (verify.length < 1) {
 
         if(league[0].users.length <= 4) {
           return League.findOneAndUpdate(
-            { name }, 
-            { $push: {users: userId} }, 
+            { name: name.toLowerCase() }, 
+            { $push: 
+              { users: { 
+                userId: user.id,
+                username: user.username,
+                team: user.teamName
+              }}
+            }, 
             { new: true }
           );
         }
