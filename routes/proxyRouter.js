@@ -4,8 +4,13 @@ const express = require('express');
 const router = express.Router();
 const fetch = require('isomorphic-fetch');
 const btoa = require('btoa');
+const passport = require('passport');
 
-const { API_ROSTER_PLAYERS_BASE_URL, API_PLAYER_LOGS_BASE_URL, API_DAILY_GAME_SCHEDULE_BASE_URL, API_PASSWORD, API_USERNAME } = require('../config');
+const { API_ROSTER_PLAYERS_BASE_URL, API_PLAYER_LOGS_BASE_URL, API_DAILY_GAME_SCHEDULE_BASE_URL, API_CUMULATIVE_STATS_BASE_URL, API_PASSWORD, API_USERNAME } = require('../config');
+const League = require('../models/League.model');
+const User = require('../models/User.model');
+const options = { session: false, failWithError: true };
+const jwtAuth = passport.authenticate('jwt', options);
 
 const todayString = () => {
   let today = new Date();
@@ -155,6 +160,108 @@ router.get('/games', (req, res, next) => {
       res.json(games);
     })
     .catch(next);
+
+});
+
+
+/* ========== GET USER'S LEAGUE STATS FROM MY SPORTS FEED ========== */
+router.post('/league', jwtAuth, (req, res, next) => {
+  const { name } = req.body;
+
+  const fetchCumStats = playerID => {
+    // fetching the stats for the 'current' season, i.e. regular & playoffs. in order to do the regular season only, a year has to be given. thus, the URL would need to be updated yearly.
+    
+    return fetch(`${API_CUMULATIVE_STATS_BASE_URL}?player=${playerID}&playerstats=2PM,3PM,FTM,PTS,BS,AST,REB,STL`, {
+      headers: {
+        'Authorization': 'Basic ' + btoa(`${API_USERNAME}:${API_PASSWORD}`)
+      }
+    })
+      .then(response => {
+        if (!response.ok) {
+          return Promise.reject(response.statusText);
+        }
+        return response.json();
+      })
+      .then(data => {
+        let api = data.cumulativeplayerstats.playerstatsentry[0];
+
+        if(api.stats) {
+          return {
+            twoPointers: api.stats.Fg2PtMade['#text'],
+            threePointers: api.stats.Fg3PtMade['#text'],
+            freeThrows: api.stats.FtMade['#text'],
+            totalPoints: api.stats.Pts['#text'],
+            rebounds: api.stats.Reb['#text'],
+            assists: api.stats.Ast['#text'],
+            steals: api.stats.Stl['#text'],
+            blocks: api.stats.Blk['#text']
+          };
+        }
+        else {
+          return 'N/A';
+        }
+      })
+      .catch(err => next(err));
+  };
+
+  let leaderboard = {};
+
+  League.find({ name })
+    .then(league => {
+      let rivals = league[0].users.map(user => {
+        // console.log('USER:', user);
+        leaderboard[user.username] = 0;
+        return user.userId;
+      }); 
+
+      return Promise.all( rivals.map( id => 
+        User.find({ _id: id})
+          .then(user => user)
+      ));
+    })
+    .then(users => users.map( user => user[0].team))
+    .then(teams => 
+      teams.map(team => 
+        team.map( player => 
+          player.playerID)
+      ))
+    .then(collectionOfIds => 
+      Promise.all(collectionOfIds.map( playerIds => 
+        Promise.all(playerIds.map( id => 
+          fetchCumStats(id)
+        )))
+      ))
+    .then(collectionOfStats => collectionOfStats.map(doc => 
+      doc.map( stat => 
+        parseInt(stat.twoPointers, 10) 
+        + parseInt(stat.threePointers, 10) 
+        + parseInt(stat.freeThrows, 10) 
+        + parseInt(stat.assists, 10) 
+        + parseInt(stat.rebounds, 10) 
+        + parseInt(stat.steals, 10) 
+        + parseInt(stat.blocks, 10)
+      )))
+    .then(playerStatTotals =>
+      playerStatTotals.map(team => {
+        let score = 0;
+        team.map(player => 
+          score += player);
+
+        return score;
+      })
+    )
+    .then(score => {
+      let keys = Object.keys(leaderboard);
+
+      leaderboard[keys[0]] = score[0];
+      leaderboard[keys[1]] === 0 ? leaderboard[keys[1]] = score[1] : null;
+      leaderboard[keys[2]] === 0 ? leaderboard[keys[2]] = score[2] : null;
+      leaderboard[keys[3]] === 0 ? leaderboard[keys[3]] = score[3] : null;
+      leaderboard[keys[4]] === 0 ? leaderboard[keys[4]] = score[4] : null;
+
+      res.status(200).json(leaderboard);
+    })
+    .catch(err => next(err));
 
 });
 
