@@ -204,13 +204,15 @@ router.post('/league', jwtAuth, (req, res, next) => {
       .catch(err => next(err));
   };
 
-  let leaderboard = {};
+  // let leaderboard = {};
+  let users = [];
 
   League.find({ name })
     .then(league => {
       let rivals = league[0].users.map(user => {
         // console.log('USER:', user);
-        leaderboard[user.username] = 0;
+        // leaderboard[user.username] = 0;
+        users.push({ [user.username]: 0 });
         return user.userId;
       }); 
 
@@ -251,13 +253,13 @@ router.post('/league', jwtAuth, (req, res, next) => {
       })
     )
     .then(score => {
-      let keys = Object.keys(leaderboard);
+ 
+      const leaderboard = users.map((user, index) => {
+        let key = Object.keys(user);
+        user[key[0]] = score[index];
 
-      leaderboard[keys[0]] = score[0];
-      leaderboard[keys[1]] === 0 ? leaderboard[keys[1]] = score[1] : null;
-      leaderboard[keys[2]] === 0 ? leaderboard[keys[2]] = score[2] : null;
-      leaderboard[keys[3]] === 0 ? leaderboard[keys[3]] = score[3] : null;
-      leaderboard[keys[4]] === 0 ? leaderboard[keys[4]] = score[4] : null;
+        return user;
+      });
 
       res.status(200).json(leaderboard);
     })
