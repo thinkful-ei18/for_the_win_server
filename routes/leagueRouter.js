@@ -9,7 +9,9 @@ const League = require('../models/League.model');
 const options = { session: false, failWithError: true };
 const jwtAuth = passport.authenticate('jwt', options);
 
+
 /* ========== RETRIEVE ALL LEAGUES ========== */
+// returns an array of one or more objects
 router.get('/', jwtAuth, (req, res, next) => {
 
   League.find({})
@@ -22,29 +24,17 @@ router.get('/', jwtAuth, (req, res, next) => {
   
 });
 
-/* ========== RETRIEVE USER'S LEAGUE ========== */
-router.get('/', jwtAuth, (req, res, next) => {
-
-  // get userId
-  // search users array within each league to see if this user's id is in there
-  // if so, return that league
-  
-  // const userId = req.user.id;
-
-  
-});
-
-
 
 /* ========== CREATE A LEAGUE ========== */
+// returns a single object
 router.post('/add', jwtAuth, (req, res, next) => {
-  
   const user = req.user;
   let { name } = req.body;
 
-  League.find({name})
+  League.find({ name })
     .count()
     .then( number => {
+      console.log('NUMBER:', number);
       if (number >= 1) {
         return Promise.reject({
           status: 422,
@@ -64,6 +54,7 @@ router.post('/add', jwtAuth, (req, res, next) => {
       });
     })
     .then(league => {
+      console.log('LEAGUE:', league);
       return res.status(201).location(`${req.originalUrl}/${league.id}`).json(league.return());
     })
     .catch(err => {
@@ -78,6 +69,7 @@ router.post('/add', jwtAuth, (req, res, next) => {
 
 
 /* ========== JOIN A LEAGUE ========== */
+// returns a single object
 router.put('/join', jwtAuth, (req, res, next) => {
   const user = req.user;
   const { name } = req.body;
@@ -119,6 +111,19 @@ router.put('/join', jwtAuth, (req, res, next) => {
     .then(league => res.json(league) )
     .catch(err =>next(err));
  
+});
+
+
+/* ========== RETRIEVE USER'S LEAGUE ========== */
+// returns an array with one object
+// this path has to be at the bottom, otherwise the '/add' & '/join' paths will match it.
+router.post('/:name', jwtAuth, (req, res, next) => {
+  const { name } = req.body;
+
+  League.find({ name })
+    .then(league => res.json(league))
+    .catch(err => next(err));
+
 });
 
 module.exports = router;
