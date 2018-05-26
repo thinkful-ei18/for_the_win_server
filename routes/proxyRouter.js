@@ -77,7 +77,8 @@ router.get('/stats', (req, res, next) => {
   fetch(
     `${API_PLAYER_LOGS_BASE_URL}?date=since-1-weeks-ago&playerstats=2PM,3PM,FTM,PTS,BS,AST,REB,STL&player=${playerID}`, {
       headers: {
-        'Authorization': 'Basic ' + btoa(`${API_USERNAME}:${API_PASSWORD}`)
+        'Authorization': 'Basic ' + btoa(`${API_USERNAME}:${API_PASSWORD}`),
+        'Accept-Encoding': 'gzip'
       }
     }
   )
@@ -135,7 +136,8 @@ router.get('/games', (req, res, next) => {
 
   fetch(`${API_DAILY_GAME_SCHEDULE_BASE_URL}?fordate=${today}`, {
     headers: {
-      'Authorization': 'Basic ' + btoa(`${API_USERNAME}:${API_PASSWORD}`)
+      'Authorization': 'Basic ' + btoa(`${API_USERNAME}:${API_PASSWORD}`),
+      'Accept-Encoding': 'gzip'
     }
   })
     .then(response => {
@@ -173,7 +175,8 @@ router.post('/league', jwtAuth, (req, res, next) => {
     
     return fetch(`${API_CUMULATIVE_STATS_BASE_URL}?player=${playerID}&playerstats=2PM,3PM,FTM,PTS,BS,AST,REB,STL`, {
       headers: {
-        'Authorization': 'Basic ' + btoa(`${API_USERNAME}:${API_PASSWORD}`)
+        'Authorization': 'Basic ' + btoa(`${API_USERNAME}:${API_PASSWORD}`),
+        'Accept-Encoding': 'gzip'
       }
     })
       .then(response => {
@@ -204,14 +207,12 @@ router.post('/league', jwtAuth, (req, res, next) => {
       .catch(err => next(err));
   };
 
-  // let leaderboard = {};
   let users = [];
 
   League.find({ name })
     .then(league => {
       let rivals = league[0].users.map(user => {
-        // console.log('USER:', user);
-        // leaderboard[user.username] = 0;
+
         users.push({ [user.username]: 0 });
         return user.userId;
       }); 
