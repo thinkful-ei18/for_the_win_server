@@ -17,8 +17,10 @@ password: demo12345
 ### Client repo
   https://github.com/thinkful-ei18/for_the_win_client
   
-### API
-https://www.mysportsfeeds.com/data-feeds/api-docs#
+### API Documentation
+https://www.mysportsfeeds.com/data-feeds/api-docs# <br>
+The NBA feeds used were: Cumulative Player Stats, Player Game Logs, Roster Players and Daily Game Schedule. <br>
+The code where these feeds were used can be found at './routes/proxyRouter.js'.
 
 ## Deployed version
   https://for-the-win-app.netlify.com/
