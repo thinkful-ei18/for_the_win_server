@@ -229,7 +229,7 @@ router.get('/league/:name', jwtAuth, (req, res, next) => {
           .then(user => user)
       ));
     })
-    .then(users => users.map( user => { console.log('USER:', user); return user[0].team;}))
+    .then(users => users.map( user => user[0].team))
     .then(teams => 
       teams.map(team => 
         team.map( player => 
@@ -275,7 +275,7 @@ router.get('/league/:name', jwtAuth, (req, res, next) => {
 
       res.status(200).json(leaderboard);
     })
-    .catch(err => {console.log('ERR:', err); next(err); });
+    .catch(err => next(err));
 
 });
 
