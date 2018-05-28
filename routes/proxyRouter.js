@@ -167,8 +167,9 @@ router.get('/games', (req, res, next) => {
 
 
 /* ========== GET USER'S LEAGUE STATS FROM MY SPORTS FEED ========== */
-router.post('/league', jwtAuth, (req, res, next) => {
-  const { name } = req.body;
+router.get('/league/:name', jwtAuth, (req, res, next) => {
+  // const { name } = req.body;
+  const { name } = req.params;
 
   const fetchCumStats = (collectionOfIds, playerIDArray) => {
     // fetching the cumulative stats for the current (regular & playoff) season. 
@@ -228,7 +229,7 @@ router.post('/league', jwtAuth, (req, res, next) => {
           .then(user => user)
       ));
     })
-    .then(users => users.map( user => { console.log('USER:', user); user[0].team;}))
+    .then(users => users.map( user => { console.log('USER:', user); return user[0].team;}))
     .then(teams => 
       teams.map(team => 
         team.map( player => 
@@ -274,7 +275,7 @@ router.post('/league', jwtAuth, (req, res, next) => {
 
       res.status(200).json(leaderboard);
     })
-    .catch(err => next(err));
+    .catch(err => {console.log('ERR:', err); next(err); });
 
 });
 
