@@ -168,7 +168,6 @@ router.get('/games', (req, res, next) => {
 
 /* ========== GET USER'S LEAGUE STATS FROM MY SPORTS FEED ========== */
 router.get('/league/:name', jwtAuth, (req, res, next) => {
-  // const { name } = req.body;
   const { name } = req.params;
 
   const fetchCumStats = (collectionOfIds, playerIDArray) => {
