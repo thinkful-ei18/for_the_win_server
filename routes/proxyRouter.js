@@ -170,39 +170,74 @@ router.get('/games', (req, res, next) => {
 router.post('/league', jwtAuth, (req, res, next) => {
   const { name } = req.body;
 
-  const fetchCumStats = playerID => {
+  // const fetchCumStats = playerID => {
+  const fetchCumStats = playerIDArray => {
     // fetching the stats for the 'current' season, i.e. regular & playoffs. in order to do the regular season only, a year has to be given. thus, the URL would need to be updated yearly.
     
-    return fetch(`${API_CUMULATIVE_STATS_BASE_URL}?player=${playerID}&playerstats=2PM,3PM,FTM,PTS,BS,AST,REB,STL`, {
+    // console.log('PLAYER ID:', playerID);
+    console.log('PLAYER ARRAY:', playerIDArray);
+
+    let playerIds = playerIDArray.toString();
+    console.log('IDS:', playerIds);
+
+    return fetch(`${API_CUMULATIVE_STATS_BASE_URL}?player=${playerIds}&playerstats=2PM,3PM,FTM,PTS,BS,AST,REB,STL`, {
       headers: {
         'Authorization': 'Basic ' + btoa(`${API_USERNAME}:${API_PASSWORD}`),
         'Accept-Encoding': 'gzip'
       }
     })
+
+    // return fetch(`${API_CUMULATIVE_STATS_BASE_URL}?player=${playerID}&playerstats=2PM,3PM,FTM,PTS,BS,AST,REB,STL`, {
+    //   headers: {
+    //     'Authorization': 'Basic ' + btoa(`${API_USERNAME}:${API_PASSWORD}`),
+    //     'Accept-Encoding': 'gzip'
+    //   }
+    // })
       .then(response => {
         if (!response.ok) {
-          return Promise.reject(response.statusText);
+          // return Promise.reject(response.statusText);
+          console.log('RESPONSE:', response);
         }
         return response.json();
       })
       .then(data => {
-        let api = data.cumulativeplayerstats.playerstatsentry[0];
+        // console.log('DATA:', data);
 
-        if(api.stats) {
+        // let api = data.cumulativeplayerstats.playerstatsentry[0];
+        // let api = data.cumulativeplayerstats.playerstatsentry;
+        // console.log('API:', api);
+        
+        let arrayofStats = data.cumulativeplayerstats.playerstatsentry.map( obj => {
+          // obj.stats
           return {
-            twoPointers: api.stats.Fg2PtMade['#text'],
-            threePointers: api.stats.Fg3PtMade['#text'],
-            freeThrows: api.stats.FtMade['#text'],
-            totalPoints: api.stats.Pts['#text'],
-            rebounds: api.stats.Reb['#text'],
-            assists: api.stats.Ast['#text'],
-            steals: api.stats.Stl['#text'],
-            blocks: api.stats.Blk['#text']
+            twoPointers: obj.stats.Fg2PtMade['#text'],
+            threePointers: obj.stats.Fg3PtMade['#text'],
+            freeThrows: obj.stats.FtMade['#text'],
+            totalPoints: obj.stats.Pts['#text'],
+            rebounds: obj.stats.Reb['#text'],
+            assists: obj.stats.Ast['#text'],
+            steals: obj.stats.Stl['#text'],
+            blocks: obj.stats.Blk['#text']
           };
-        }
-        else {
-          return 'N/A';
-        }
+        });
+        
+        console.log('STATS:', arrayofStats);
+
+        // if(api.stats) {
+        //   return {
+        //     twoPointers: api.stats.Fg2PtMade['#text'],
+        //     threePointers: api.stats.Fg3PtMade['#text'],
+        //     freeThrows: api.stats.FtMade['#text'],
+        //     totalPoints: api.stats.Pts['#text'],
+        //     rebounds: api.stats.Reb['#text'],
+        //     assists: api.stats.Ast['#text'],
+        //     steals: api.stats.Stl['#text'],
+        //     blocks: api.stats.Blk['#text']
+        //   };
+        // }
+        // else {
+        //   return 'N/A';
+        // }
       })
       .catch(err => next(err));
   };
@@ -228,42 +263,55 @@ router.post('/league', jwtAuth, (req, res, next) => {
         team.map( player => 
           player.playerID)
       ))
-    .then(collectionOfIds => 
-      Promise.all(collectionOfIds.map( playerIds => 
-        Promise.all(playerIds.map( id => 
-          fetchCumStats(id)
-        )))
-      ))
-    .then(collectionOfStats => collectionOfStats.map(doc => 
-      doc.map( stat => 
-        parseInt(stat.twoPointers, 10) 
-        + parseInt(stat.threePointers, 10) 
-        + parseInt(stat.freeThrows, 10) 
-        + parseInt(stat.assists, 10) 
-        + parseInt(stat.rebounds, 10) 
-        + parseInt(stat.steals, 10) 
-        + parseInt(stat.blocks, 10)
-      )))
-    .then(playerStatTotals =>
-      playerStatTotals.map(team => {
-        let score = 0;
-        team.map(player => 
-          score += player);
+    .then(collectionOfIds => {
+      // Promise.all(collectionOfIds.map( playerIds => 
+      //   Promise.all(playerIds.map( id => 
+      //     fetchCumStats(id)
+      //   )))
+      // );
 
-        return score;
-      })
-    )
-    .then(score => {
- 
-      const leaderboard = users.map((user, index) => {
-        let key = Object.keys(user);
-        user[key[0]] = score[index];
+      /*
+      make the array of arrays into one big array of playerIds
+      pass every player id into fetchCumStats at once, it will return a large array of the properly styled objects
 
-        return user;
-      });
+      .then() - map over that big array of objects separating every 10 objects into their own array.
+      each array then needs to be pushed into an extra array that will be passed as collectionOfStats
+       
+       */
 
-      res.status(200).json(leaderboard);
+      return Promise.all(collectionOfIds.map( playerIds => fetchCumStats(playerIds)));
     })
+    .then(next => console.log('NEXT:', next))
+    // .then(collectionOfStats => collectionOfStats.map(doc => 
+    //   doc.map( stat => 
+    //     parseInt(stat.twoPointers, 10) 
+    //     + parseInt(stat.threePointers, 10) 
+    //     + parseInt(stat.freeThrows, 10) 
+    //     + parseInt(stat.assists, 10) 
+    //     + parseInt(stat.rebounds, 10) 
+    //     + parseInt(stat.steals, 10) 
+    //     + parseInt(stat.blocks, 10)
+    //   )))
+    // .then(playerStatTotals =>
+    //   playerStatTotals.map(team => {
+    //     let score = 0;
+    //     team.map(player => 
+    //       score += player);
+
+    //     return score;
+    //   })
+    // )
+    // .then(score => {
+ 
+    //   const leaderboard = users.map((user, index) => {
+    //     let key = Object.keys(user);
+    //     user[key[0]] = score[index];
+
+    //     return user;
+    //   });
+
+    //   res.status(200).json(leaderboard);
+    // })
     .catch(err => next(err));
 
 });
