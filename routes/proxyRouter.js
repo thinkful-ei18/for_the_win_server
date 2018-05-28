@@ -171,14 +171,14 @@ router.post('/league', jwtAuth, (req, res, next) => {
   const { name } = req.body;
 
   // const fetchCumStats = playerID => {
-  const fetchCumStats = playerIDArray => {
+  const fetchCumStats = (collectionOfIds, playerIDArray) => {
     // fetching the stats for the 'current' season, i.e. regular & playoffs. in order to do the regular season only, a year has to be given. thus, the URL would need to be updated yearly.
     
     // console.log('PLAYER ID:', playerID);
-    console.log('PLAYER ARRAY:', playerIDArray);
+    // console.log('PLAYER ARRAY:', playerIDArray);
 
     let playerIds = playerIDArray.toString();
-    console.log('IDS:', playerIds);
+    // console.log('IDS:', playerIds);
 
     return fetch(`${API_CUMULATIVE_STATS_BASE_URL}?player=${playerIds}&playerstats=2PM,3PM,FTM,PTS,BS,AST,REB,STL`, {
       headers: {
@@ -209,7 +209,9 @@ router.post('/league', jwtAuth, (req, res, next) => {
         
         let arrayofStats = data.cumulativeplayerstats.playerstatsentry.map( obj => {
           // obj.stats
+          // console.log('PLAYER:', obj.player);
           return {
+            playerId: obj.player.ID,
             twoPointers: obj.stats.Fg2PtMade['#text'],
             threePointers: obj.stats.Fg3PtMade['#text'],
             freeThrows: obj.stats.FtMade['#text'],
@@ -221,7 +223,9 @@ router.post('/league', jwtAuth, (req, res, next) => {
           };
         });
         
-        console.log('STATS:', arrayofStats);
+        // console.log('STATS:', arrayofStats);
+
+        return arrayofStats;
 
         // if(api.stats) {
         //   return {
@@ -238,6 +242,15 @@ router.post('/league', jwtAuth, (req, res, next) => {
         // else {
         //   return 'N/A';
         // }
+      })
+      .then( arrayofStats => {
+        // console.log('TEST:', collectionOfIds);
+        // console.log('MAYBE:', arrayofStats);
+
+        return collectionOfIds.map( array => 
+          array.map( id => 
+            arrayofStats.find(obj => 
+              obj.playerId === id)));
       })
       .catch(err => next(err));
   };
@@ -279,39 +292,58 @@ router.post('/league', jwtAuth, (req, res, next) => {
        
        */
 
-      return Promise.all(collectionOfIds.map( playerIds => fetchCumStats(playerIds)));
+      console.log('COLLECTION:', collectionOfIds);
+      
+      let allPlayerIds = [];
+      collectionOfIds.map( playerIds => 
+        playerIds.map( id =>
+          allPlayerIds.push(id)
+        ));
+
+      // console.log('ALL:', allPlayerIds);
+
+      return fetchCumStats(collectionOfIds, allPlayerIds);
+
+      // return {
+      //   stats: fetchCumStats(allPlayerIds), 
+      //   collection: collectionOfIds
+      // };
+
+      // console.log('BIG:', allStats);
+
+      // return Promise.all(collectionOfIds.map( playerIds => fetchCumStats(playerIds)));
     })
-    .then(next => console.log('NEXT:', next))
-    // .then(collectionOfStats => collectionOfStats.map(doc => 
-    //   doc.map( stat => 
-    //     parseInt(stat.twoPointers, 10) 
-    //     + parseInt(stat.threePointers, 10) 
-    //     + parseInt(stat.freeThrows, 10) 
-    //     + parseInt(stat.assists, 10) 
-    //     + parseInt(stat.rebounds, 10) 
-    //     + parseInt(stat.steals, 10) 
-    //     + parseInt(stat.blocks, 10)
-    //   )))
-    // .then(playerStatTotals =>
-    //   playerStatTotals.map(team => {
-    //     let score = 0;
-    //     team.map(player => 
-    //       score += player);
+    // .then(next => console.log('NEXT:', next))
+    .then(collectionOfStats => collectionOfStats.map(doc => 
+      doc.map( stat => 
+        parseInt(stat.twoPointers, 10) 
+        + parseInt(stat.threePointers, 10) 
+        + parseInt(stat.freeThrows, 10) 
+        + parseInt(stat.assists, 10) 
+        + parseInt(stat.rebounds, 10) 
+        + parseInt(stat.steals, 10) 
+        + parseInt(stat.blocks, 10)
+      )))
+    .then(playerStatTotals =>
+      playerStatTotals.map(team => {
+        let score = 0;
+        team.map(player => 
+          score += player);
 
-    //     return score;
-    //   })
-    // )
-    // .then(score => {
+        return score;
+      })
+    )
+    .then(score => {
  
-    //   const leaderboard = users.map((user, index) => {
-    //     let key = Object.keys(user);
-    //     user[key[0]] = score[index];
+      const leaderboard = users.map((user, index) => {
+        let key = Object.keys(user);
+        user[key[0]] = score[index];
 
-    //     return user;
-    //   });
+        return user;
+      });
 
-    //   res.status(200).json(leaderboard);
-    // })
+      res.status(200).json(leaderboard);
+    })
     .catch(err => next(err));
 
 });
