@@ -117,8 +117,8 @@ router.put('/join', jwtAuth, (req, res, next) => {
 /* ========== RETRIEVE USER'S LEAGUE ========== */
 // returns an array with one object
 // this path has to be at the bottom, otherwise the '/add' & '/join' paths will match it.
-router.post('/:name', jwtAuth, (req, res, next) => {
-  const { name } = req.body;
+router.get('/:name', jwtAuth, (req, res, next) => {
+  const { name } = req.params;
 
   League.find({ name })
     .then(league => res.json(league))
