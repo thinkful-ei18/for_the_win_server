@@ -43,7 +43,9 @@ router.get('/players', (req, res, next) => {
   )
     .then(response => {
       if (!response.ok) {
-        return Promise.reject(response.statusText);
+        return Promise.reject({
+          status: response.status,
+          message: response.statusText});
       }
       return response.json();
     })
@@ -84,7 +86,9 @@ router.get('/stats', (req, res, next) => {
   )
     .then(response => {
       if (!response.ok) {
-        return Promise.reject(response.statusText);
+        return Promise.reject({
+          status: response.status,
+          message: response.statusText});
       }
       return response.json();
     })
@@ -142,7 +146,9 @@ router.get('/games', (req, res, next) => {
   })
     .then(response => {
       if (!response.ok) {
-        return Promise.reject(response.statusText);
+        return Promise.reject({
+          status: response.status,
+          message: response.statusText});
       }
       return response.json();
     })
@@ -166,7 +172,7 @@ router.get('/games', (req, res, next) => {
 });
 
 
-/* ========== GET USER'S LEAGUE STATS FROM MY SPORTS FEED ========== */
+/* ========== GET USER'S LEADERBOARD FROM MY SPORTS FEED ========== */
 router.get('/league/:name', jwtAuth, (req, res, next) => {
   const { name } = req.params;
 
@@ -183,7 +189,9 @@ router.get('/league/:name', jwtAuth, (req, res, next) => {
     })
       .then(response => {
         if (!response.ok) {
-          return Promise.reject(response.statusText);
+          return Promise.reject({
+            status: response.status,
+            message: response.statusText});
         }
         return response.json();
       })
