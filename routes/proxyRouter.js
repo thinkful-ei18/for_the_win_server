@@ -170,15 +170,10 @@ router.get('/games', (req, res, next) => {
 router.post('/league', jwtAuth, (req, res, next) => {
   const { name } = req.body;
 
-  // const fetchCumStats = playerID => {
   const fetchCumStats = (collectionOfIds, playerIDArray) => {
-    // fetching the stats for the 'current' season, i.e. regular & playoffs. in order to do the regular season only, a year has to be given. thus, the URL would need to be updated yearly.
-    
-    // console.log('PLAYER ID:', playerID);
-    // console.log('PLAYER ARRAY:', playerIDArray);
-
+    // fetching the cumulative stats for the current (regular & playoff) season. 
+   
     let playerIds = playerIDArray.toString();
-    // console.log('IDS:', playerIds);
 
     return fetch(`${API_CUMULATIVE_STATS_BASE_URL}?player=${playerIds}&playerstats=2PM,3PM,FTM,PTS,BS,AST,REB,STL`, {
       headers: {
@@ -186,75 +181,38 @@ router.post('/league', jwtAuth, (req, res, next) => {
         'Accept-Encoding': 'gzip'
       }
     })
-
-    // return fetch(`${API_CUMULATIVE_STATS_BASE_URL}?player=${playerID}&playerstats=2PM,3PM,FTM,PTS,BS,AST,REB,STL`, {
-    //   headers: {
-    //     'Authorization': 'Basic ' + btoa(`${API_USERNAME}:${API_PASSWORD}`),
-    //     'Accept-Encoding': 'gzip'
-    //   }
-    // })
       .then(response => {
         if (!response.ok) {
-          // return Promise.reject(response.statusText);
-          console.log('RESPONSE:', response);
+          return Promise.reject(response.statusText);
         }
         return response.json();
       })
       .then(data => {
-        // console.log('DATA:', data);
-
-        // let api = data.cumulativeplayerstats.playerstatsentry[0];
-        // let api = data.cumulativeplayerstats.playerstatsentry;
-        // console.log('API:', api);
         
-        let arrayofStats = data.cumulativeplayerstats.playerstatsentry.map( obj => {
-          // obj.stats
-          // console.log('PLAYER:', obj.player);
-          return {
-            playerId: obj.player.ID,
-            twoPointers: obj.stats.Fg2PtMade['#text'],
-            threePointers: obj.stats.Fg3PtMade['#text'],
-            freeThrows: obj.stats.FtMade['#text'],
-            totalPoints: obj.stats.Pts['#text'],
-            rebounds: obj.stats.Reb['#text'],
-            assists: obj.stats.Ast['#text'],
-            steals: obj.stats.Stl['#text'],
-            blocks: obj.stats.Blk['#text']
-          };
-        });
+        let arrayofStats = data.cumulativeplayerstats.playerstatsentry.map( obj => ({
+          playerId: obj.player.ID,
+          twoPointers: obj.stats.Fg2PtMade['#text'],
+          threePointers: obj.stats.Fg3PtMade['#text'],
+          freeThrows: obj.stats.FtMade['#text'],
+          totalPoints: obj.stats.Pts['#text'],
+          rebounds: obj.stats.Reb['#text'],
+          assists: obj.stats.Ast['#text'],
+          steals: obj.stats.Stl['#text'],
+          blocks: obj.stats.Blk['#text']
+        })
+        );
         
-        // console.log('STATS:', arrayofStats);
-
         return arrayofStats;
-
-        // if(api.stats) {
-        //   return {
-        //     twoPointers: api.stats.Fg2PtMade['#text'],
-        //     threePointers: api.stats.Fg3PtMade['#text'],
-        //     freeThrows: api.stats.FtMade['#text'],
-        //     totalPoints: api.stats.Pts['#text'],
-        //     rebounds: api.stats.Reb['#text'],
-        //     assists: api.stats.Ast['#text'],
-        //     steals: api.stats.Stl['#text'],
-        //     blocks: api.stats.Blk['#text']
-        //   };
-        // }
-        // else {
-        //   return 'N/A';
-        // }
       })
-      .then( arrayofStats => {
-        // console.log('TEST:', collectionOfIds);
-        // console.log('MAYBE:', arrayofStats);
-
-        return collectionOfIds.map( array => 
-          array.map( id => 
-            arrayofStats.find(obj => 
-              obj.playerId === id)));
-      })
+      .then( arrayofStats => collectionOfIds.map( array => 
+        array.map( id => 
+          arrayofStats.find(obj => 
+            obj.playerId === id)))
+      )
       .catch(err => next(err));
   };
 
+  
   let users = [];
 
   League.find({ name })
@@ -277,43 +235,15 @@ router.post('/league', jwtAuth, (req, res, next) => {
           player.playerID)
       ))
     .then(collectionOfIds => {
-      // Promise.all(collectionOfIds.map( playerIds => 
-      //   Promise.all(playerIds.map( id => 
-      //     fetchCumStats(id)
-      //   )))
-      // );
 
-      /*
-      make the array of arrays into one big array of playerIds
-      pass every player id into fetchCumStats at once, it will return a large array of the properly styled objects
-
-      .then() - map over that big array of objects separating every 10 objects into their own array.
-      each array then needs to be pushed into an extra array that will be passed as collectionOfStats
-       
-       */
-
-      console.log('COLLECTION:', collectionOfIds);
-      
       let allPlayerIds = [];
       collectionOfIds.map( playerIds => 
         playerIds.map( id =>
           allPlayerIds.push(id)
         ));
 
-      // console.log('ALL:', allPlayerIds);
-
       return fetchCumStats(collectionOfIds, allPlayerIds);
-
-      // return {
-      //   stats: fetchCumStats(allPlayerIds), 
-      //   collection: collectionOfIds
-      // };
-
-      // console.log('BIG:', allStats);
-
-      // return Promise.all(collectionOfIds.map( playerIds => fetchCumStats(playerIds)));
     })
-    // .then(next => console.log('NEXT:', next))
     .then(collectionOfStats => collectionOfStats.map(doc => 
       doc.map( stat => 
         parseInt(stat.twoPointers, 10) 
