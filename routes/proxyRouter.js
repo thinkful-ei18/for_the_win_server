@@ -228,7 +228,7 @@ router.post('/league', jwtAuth, (req, res, next) => {
           .then(user => user)
       ));
     })
-    .then(users => users.map( user => user[0].team))
+    .then(users => users.map( user => { console.log('USER:', user); user[0].team;}))
     .then(teams => 
       teams.map(team => 
         team.map( player => 
