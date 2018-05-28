@@ -170,10 +170,12 @@ router.get('/games', (req, res, next) => {
 router.post('/league', jwtAuth, (req, res, next) => {
   const { name } = req.body;
 
-  const fetchCumStats = playerID => {
-    // fetching the stats for the 'current' season, i.e. regular & playoffs. in order to do the regular season only, a year has to be given. thus, the URL would need to be updated yearly.
-    
-    return fetch(`${API_CUMULATIVE_STATS_BASE_URL}?player=${playerID}&playerstats=2PM,3PM,FTM,PTS,BS,AST,REB,STL`, {
+  const fetchCumStats = (collectionOfIds, playerIDArray) => {
+    // fetching the cumulative stats for the current (regular & playoff) season. 
+   
+    let playerIds = playerIDArray.toString();
+
+    return fetch(`${API_CUMULATIVE_STATS_BASE_URL}?player=${playerIds}&playerstats=2PM,3PM,FTM,PTS,BS,AST,REB,STL`, {
       headers: {
         'Authorization': 'Basic ' + btoa(`${API_USERNAME}:${API_PASSWORD}`),
         'Accept-Encoding': 'gzip'
@@ -186,27 +188,31 @@ router.post('/league', jwtAuth, (req, res, next) => {
         return response.json();
       })
       .then(data => {
-        let api = data.cumulativeplayerstats.playerstatsentry[0];
-
-        if(api.stats) {
-          return {
-            twoPointers: api.stats.Fg2PtMade['#text'],
-            threePointers: api.stats.Fg3PtMade['#text'],
-            freeThrows: api.stats.FtMade['#text'],
-            totalPoints: api.stats.Pts['#text'],
-            rebounds: api.stats.Reb['#text'],
-            assists: api.stats.Ast['#text'],
-            steals: api.stats.Stl['#text'],
-            blocks: api.stats.Blk['#text']
-          };
-        }
-        else {
-          return 'N/A';
-        }
+        
+        let arrayofStats = data.cumulativeplayerstats.playerstatsentry.map( obj => ({
+          playerId: obj.player.ID,
+          twoPointers: obj.stats.Fg2PtMade['#text'],
+          threePointers: obj.stats.Fg3PtMade['#text'],
+          freeThrows: obj.stats.FtMade['#text'],
+          totalPoints: obj.stats.Pts['#text'],
+          rebounds: obj.stats.Reb['#text'],
+          assists: obj.stats.Ast['#text'],
+          steals: obj.stats.Stl['#text'],
+          blocks: obj.stats.Blk['#text']
+        })
+        );
+        
+        return arrayofStats;
       })
+      .then( arrayofStats => collectionOfIds.map( array => 
+        array.map( id => 
+          arrayofStats.find(obj => 
+            obj.playerId === id)))
+      )
       .catch(err => next(err));
   };
 
+  
   let users = [];
 
   League.find({ name })
@@ -228,12 +234,16 @@ router.post('/league', jwtAuth, (req, res, next) => {
         team.map( player => 
           player.playerID)
       ))
-    .then(collectionOfIds => 
-      Promise.all(collectionOfIds.map( playerIds => 
-        Promise.all(playerIds.map( id => 
-          fetchCumStats(id)
-        )))
-      ))
+    .then(collectionOfIds => {
+
+      let allPlayerIds = [];
+      collectionOfIds.map( playerIds => 
+        playerIds.map( id =>
+          allPlayerIds.push(id)
+        ));
+
+      return fetchCumStats(collectionOfIds, allPlayerIds);
+    })
     .then(collectionOfStats => collectionOfStats.map(doc => 
       doc.map( stat => 
         parseInt(stat.twoPointers, 10) 
