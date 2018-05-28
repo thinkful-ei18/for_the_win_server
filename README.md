@@ -18,9 +18,18 @@ password: demo12345
   https://github.com/thinkful-ei18/for_the_win_client
   
 ### API Documentation
-https://www.mysportsfeeds.com/data-feeds/api-docs# <br>
-The NBA feeds used were: Cumulative Player Stats, Player Game Logs, Roster Players and Daily Game Schedule. <br>
-The code where these feeds were used can be found at './routes/proxyRouter.js'.
+A RESTful API, created by myself, as well as a third party API hosted by <a href='https://www.mysportsfeeds.com/data-feeds/api-docs#'>MySportsFeed</a> were used to handle the requests from the client portion of For The Win. 
+
+<br><br>
+
+<b>'./routes/leagueRouter.js'</b> -- details the creation, addition to and retrieval of a fantasy basketball league. <br>
+<b>'./routes/loginRouter.js'</b> -- details the login process using OAuth 2.0. <br>
+<b>'./routes/registerRouter.js'</b> -- details the user creation process, with several verification steps along the way. <br>
+<b>'./routes/teamRouter.js'</b> -- details how each user adds to, removes from, or gets their team of 10 players.
+
+<br><br>
+
+<b>'./routes/proxyRouter.js'</b> -- incorporates the use of the following feeds from MySportsFeeds: Cumulative Player Stats, Player Game Logs, Roster Players and Daily Game Schedule.
 
 ## Deployed version
   https://for-the-win-app.netlify.com/
