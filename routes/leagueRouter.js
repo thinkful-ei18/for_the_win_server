@@ -5,6 +5,7 @@ const router = express.Router();
 const passport = require('passport');
 
 const League = require('../models/League.model');
+const User = require('../models/User.model');
 
 const options = { session: false, failWithError: true };
 const jwtAuth = passport.authenticate('jwt', options);
@@ -34,7 +35,6 @@ router.post('/add', jwtAuth, (req, res, next) => {
   League.find({ name })
     .count()
     .then( number => {
-      console.log('NUMBER:', number);
       if (number >= 1) {
         return Promise.reject({
           status: 422,
@@ -54,7 +54,9 @@ router.post('/add', jwtAuth, (req, res, next) => {
       });
     })
     .then(league => {
-      console.log('LEAGUE:', league);
+
+      User.findByIdAndUpdate(user.id, { leagueName: league.name}).then(user => user);
+
       return res.status(201).location(`${req.originalUrl}/${league.id}`).json(league.return());
     })
     .catch(err => {
@@ -108,7 +110,11 @@ router.put('/join', jwtAuth, (req, res, next) => {
         throw err;
       }
     })
-    .then(league => res.json(league) )
+    .then(league => {
+      User.findByIdAndUpdate(user.id, { leagueName: league.name}).then(user => user);
+      
+      return res.json(league);
+    })
     .catch(err =>next(err));
  
 });
