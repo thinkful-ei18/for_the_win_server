@@ -31,8 +31,6 @@ const todayString = () => {
 
 /* ========== GET ALL ACTIVE PLAYERS FROM MY SPORTS FEED ========== */
 router.get('/players', (req, res, next) => {
-  // const today = todayString();
-  console.log('URL:', `${API_MSF_BASE_URL}${PLAYERS}`);
 
   fetch(
     `${API_MSF_BASE_URL}${PLAYERS}`, {
@@ -42,7 +40,6 @@ router.get('/players', (req, res, next) => {
     }
   )
     .then(response => {
-      console.log('RESPONSE:', response);
       if (!response.ok) {
         return Promise.reject({
           status: response.status,
@@ -51,23 +48,24 @@ router.get('/players', (req, res, next) => {
       return response.json();
     })
     .then(data => {
-      // const currentlySignedPlayers = data.rosterplayers.playerentry.filter(obj => obj.team !== undefined);
+      const currentlySignedPlayers = data.players.filter(player => player.teamAsOfDate !== null);
 
-      // const selectablePlayers = currentlySignedPlayers.map(obj => {
-      //   const firstName = obj.player.FirstName;
-      //   const lastName = obj.player.LastName;
-      //   const playerID = obj.player.ID;
-      //   const playerTeam = `${obj.team.City} ${obj.team.Name}`;
-      //   return {
-      //     playerID,
-      //     firstName,
-      //     lastName,
-      //     playerTeam
-      //   };
-      // });
+      const selectablePlayers = currentlySignedPlayers.map(obj => {
+        const playerPic = obj.player.officialImageSrc;
+        const playerName = `${obj.player.firstName} ${obj.player.lastName}`
+        const playerID = obj.player.id;
+        const playerTeam = obj.player.currentTeam.abbreviation;
+        const playerPosition = obj.player.primaryPosition;
+        return {
+          playerPic,
+          playerID,
+          playerName,
+          playerTeam,
+          playerPosition
+        };
+      });
 
-      // res.json(selectablePlayers);
-      res.json(data);
+      res.json(selectablePlayers);
     })
     .catch(next);
 });
