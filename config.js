@@ -11,9 +11,9 @@ module.exports = {
 
   API_USERNAME: process.env.SPORTS_FEED_UN,
 
-  API_MSF_BASE_URL: process.env.API_MSF_BASE_URL,
+  API_BASE_URL: process.env.API_BASE_URL,
 
-  PLAYERS: process.env.PLAYERS,
+  GET_PLAYERS_FEED: process.env.GET_PLAYERS_FEED,
 
   JWT_SECRET: process.env.JWT_SECRET,
 

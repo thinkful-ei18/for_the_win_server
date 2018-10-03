@@ -6,7 +6,7 @@ const fetch = require('isomorphic-fetch');
 const btoa = require('btoa');
 const passport = require('passport');
 
-const { API_USERNAME, API_MSF_BASE_URL, PLAYERS } = require('../config');
+const { API_USERNAME, API_BASE_URL, GET_PLAYERS_FEED } = require('../config');
 const League = require('../models/League.model');
 const User = require('../models/User.model');
 const options = { session: false, failWithError: true };
@@ -31,9 +31,9 @@ const todayString = () => {
 
 /* ========== GET ALL ACTIVE PLAYERS FROM MY SPORTS FEED ========== */
 router.get('/players', (req, res, next) => {
-
+  
   fetch(
-    `${API_MSF_BASE_URL}${PLAYERS}`, {
+    `${API_BASE_URL}${GET_PLAYERS_FEED}`, {
       headers: {
         'Authorization': 'Basic ' + btoa(`${API_USERNAME}:MYSPORTSFEEDS`)
       }
