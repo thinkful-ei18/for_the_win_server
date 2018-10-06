@@ -6,7 +6,7 @@ const fetch = require('isomorphic-fetch');
 const btoa = require('btoa');
 const passport = require('passport');
 
-const { API_USERNAME, API_BASE_URL, GET_PLAYERS_FEED } = require('../config');
+const { API_USERNAME, API_BASE_URL, GET_PLAYERS_FEED, DAILY_PLAYER_STATS_FEED } = require('../config');
 const League = require('../models/League.model');
 const User = require('../models/User.model');
 const options = { session: false, failWithError: true };
@@ -29,7 +29,7 @@ const todayString = () => {
 };
 
 
-/* ========== GET ALL ACTIVE PLAYERS FROM MY SPORTS FEED ========== */
+/* ========== GET ALL ACTIVE PLAYERS FROM THE API ========== */
 router.get('/players', (req, res, next) => {
   
   fetch(
@@ -37,8 +37,7 @@ router.get('/players', (req, res, next) => {
       headers: {
         'Authorization': 'Basic ' + btoa(`${API_USERNAME}:MYSPORTSFEEDS`)
       }
-    }
-  )
+    })
     .then(response => {
       if (!response.ok) {
         return Promise.reject({
@@ -71,16 +70,15 @@ router.get('/players', (req, res, next) => {
 });
 
 
-/* ========== GET PLAYER STATS FROM MY SPORTS FEED ========== */
+/* ========== GET PLAYER STATS FROM THE API ========== */
 router.get('/stats', (req, res, next) => {
 
   const playerIDs = req.query.idString;
 
   fetch(
-    `${API_PLAYER_LOGS_BASE_URL}?date=since-1-weeks-ago&playerstats=2PM,3PM,FTM,PTS,BS,AST,REB,STL&player=${playerIDs}`, {
+    `${API_BASE_URL}${DAILY_PLAYER_STATS_FEED}${playerIDs}&stats=2PM,3PM,FTM,BS,AST,REB,STL,PF,TF`, {
       headers: {
-        'Authorization': 'Basic ' + btoa(`${API_USERNAME}:${API_PASSWORD}`),
-        'Accept-Encoding': 'gzip'
+        'Authorization': 'Basic ' + btoa(`${API_USERNAME}:MYSPORTSFEEDS`)
       }
     })
     .then(response => {
@@ -91,37 +89,49 @@ router.get('/stats', (req, res, next) => {
       }
       return response.json();
     })
-    .then(data =>  data.playergamelogs.gamelogs.map(obj => ({
-      firstName: obj.player.FirstName,
-      lastName: obj.player.LastName,
-      dateOfGame: obj.game.date,
-      playerID: obj.player.ID,
-      twoPointers: obj.stats.Fg2PtMade['#text'],
-      threePointers: obj.stats.Fg3PtMade['#text'],
-      freeThrows: obj.stats.FtMade['#text'],
-      totalPoints: obj.stats.Pts['#text'],
-      rebounds: obj.stats.Reb['#text'],
-      assists: obj.stats.Ast['#text'],
-      steals: obj.stats.Stl['#text'],
-      blocks: obj.stats.Blk['#text']
-    })) )
-    .then(statArray => {
+    .then(data =>  {
+      const lastGamelog = data.gamelogs.length-1;
+      let playerStats = [];
 
-      let teamArray = [];
-      statArray.forEach( stat => {
-        if(!teamArray.find(obj => obj.playerID === stat.playerID)) {
-          teamArray.push(stat);
+      for(let i=lastGamelog; i>=0; i--) {
+
+        if(!playerStats.find(obj => obj.playerID === data.gamelogs[i].player.id)) {
+          playerStats.push({
+            playerName: `${data.gamelogs[i].player.firstName} ${data.gamelogs[i].player.lastName}`,
+            dateOfGame: data.gamelogs[i].game.startTime.substring(0,10),
+            playerID: data.gamelogs[i].player.id,
+            twoPointers: data.gamelogs[i].stats.fieldGoals.fg2PtMade,
+            threePointers: data.gamelogs[i].stats.fieldGoals.fg3PtMade,
+            freeThrows: data.gamelogs[i].stats.freeThrows.ftMade,
+            rebounds: data.gamelogs[i].stats.rebounds.reb,
+            assists: data.gamelogs[i].stats.offense.ast,
+            steals: data.gamelogs[i].stats.defense.stl,
+            blocks: data.gamelogs[i].stats.defense.blk,
+            personalFouls: data.gamelogs[i].stats.miscellaneous.foulPers,
+            technicalFouls: data.gamelogs[i].stats.miscellaneous.foulTech
+          });
         }
-      });
+      }
 
-      res.json(teamArray);
+      res.json(playerStats);
     })
-    .then(team => res.json(team))
+    // .then(statArray => {
+
+    //   let teamArray = [];
+    //   statArray.forEach( stat => {
+    //     if(!teamArray.find(obj => obj.playerID === stat.playerID)) {
+    //       teamArray.push(stat);
+    //     }
+    //   });
+
+    //   res.json(teamArray);
+    // })
+    // .then(team => res.json(team))
     .catch(next);
 });
 
 
-/* ========== GET DAILY GAME SCHEDULE FROM MY SPORTS FEED ========== */
+/* ========== GET DAILY GAME SCHEDULE FROM THE API ========== */
 
 router.get('/games', (req, res, next) => {
   const today = todayString();
@@ -160,7 +170,7 @@ router.get('/games', (req, res, next) => {
 });
 
 
-/* ========== GET USER'S LEADERBOARD FROM MY SPORTS FEED ========== */
+/* ========== GET USER'S LEADERBOARD FROM THE API ========== */
 router.get('/league/:name', jwtAuth, (req, res, next) => {
   const { name } = req.params;
 
