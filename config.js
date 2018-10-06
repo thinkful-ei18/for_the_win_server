@@ -15,6 +15,8 @@ module.exports = {
 
   GET_PLAYERS_FEED: process.env.GET_PLAYERS_FEED,
 
+  DAILY_PLAYER_STATS_FEED: process.env.DAILY_PLAYER_STATS_FEED,
+
   JWT_SECRET: process.env.JWT_SECRET,
 
   JWT_EXPIRY: process.env.JWT_EXPIRY || '3d',
