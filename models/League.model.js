@@ -10,9 +10,14 @@ const leagueSchema = new Schema({
     unique: true,
     trim: true
   },
-  users: {
+  managers: {
     type: Array,
     required: true
+  },
+  players: {
+    type: Array,
+    required: true,
+    default: []
   }
 });
 
@@ -29,7 +34,7 @@ leagueSchema.set('toObject', {
 leagueSchema.methods.return = function () {
   return {
     name: this.name,
-    users: this.users,
+    managers: this.managers,
     players: this.players
   };
 };
@@ -38,14 +43,3 @@ leagueSchema.methods.return = function () {
 const League = mongoose.model('League', leagueSchema);
 
 module.exports = League;
-
-
-/**
-Extension feature:
- - add "players" prop so only 1 member of each league can have each player.
-  players: {
-    type: Array,
-    required: true,
-    default: []
-  }
- */
