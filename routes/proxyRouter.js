@@ -6,7 +6,7 @@ const fetch = require('isomorphic-fetch');
 const btoa = require('btoa');
 const passport = require('passport');
 
-const { API_USERNAME, API_BASE_URL, GET_PLAYERS_FEED, DAILY_PLAYER_STATS_FEED } = require('../config');
+const { API_USERNAME, API_BASE_URL, GET_PLAYERS_FEED, DAILY_PLAYER_STATS_FEED, DAILY_GAMES_FEED } = require('../config');
 const League = require('../models/League.model');
 const User = require('../models/User.model');
 const options = { session: false, failWithError: true };
@@ -136,10 +136,9 @@ router.get('/stats', (req, res, next) => {
 router.get('/games', (req, res, next) => {
   const today = todayString();
 
-  fetch(`${API_DAILY_GAME_SCHEDULE_BASE_URL}?fordate=${today}`, {
+  fetch(`${API_BASE_URL}${DAILY_GAMES_FEED}`, {
     headers: {
-      'Authorization': 'Basic ' + btoa(`${API_USERNAME}:${API_PASSWORD}`),
-      'Accept-Encoding': 'gzip'
+      'Authorization': 'Basic ' + btoa(`${API_USERNAME}:MYSPORTSFEEDS`)
     }
   })
     .then(response => {
@@ -151,18 +150,20 @@ router.get('/games', (req, res, next) => {
       return response.json();
     })
     .then(data => {
-      let games;
-      if(data.dailygameschedule.gameentry) {
-        games = data.dailygameschedule.gameentry.map( obj => ({
-          gameDate: obj.date,
-          gameTime: obj.time,
-          awayTeam: `${obj.awayTeam.City} ${obj.awayTeam.Name}`,
-          homeTeam: `${obj.homeTeam.City} ${obj.homeTeam.Name}`
-        }));
+      const lastGameToday = data.games.length-1;
+      let games = [];
+
+      for(let i=lastGameToday; i>=0; i--) {
+        if(data.games[i].schedule.startTime.substring(0,10)===today) {
+          games.push({
+            gameDate: data.games[i].schedule.startTime.substring(0,10),
+            gameTime: data.games[i].schedule.startTime.substring(11,16),
+            awayTeam: data.games[i].schedule.awayTeam.abbreviation,
+            homeTeam: data.games[i].schedule.homeTeam.abbreviation
+          });
+        }
       }
-      else {
-        games = false;
-      }
+
       res.json(games);
     })
     .catch(next);
