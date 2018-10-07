@@ -115,18 +115,6 @@ router.get('/stats', (req, res, next) => {
 
       res.json(playerStats);
     })
-    // .then(statArray => {
-
-    //   let teamArray = [];
-    //   statArray.forEach( stat => {
-    //     if(!teamArray.find(obj => obj.playerID === stat.playerID)) {
-    //       teamArray.push(stat);
-    //     }
-    //   });
-
-    //   res.json(teamArray);
-    // })
-    // .then(team => res.json(team))
     .catch(next);
 });
 
