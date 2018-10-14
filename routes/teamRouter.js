@@ -5,6 +5,7 @@ const router = express.Router();
 const passport = require('passport');
 
 const User = require('../models/User.model');
+const League = require('../models/League.model');
 
 const options = { session: false, failWithError: true };
 const jwtAuth = passport.authenticate('jwt', options);
@@ -27,10 +28,22 @@ router.get('/', jwtAuth, (req, res, next) => {
 router.put('/add', jwtAuth, (req, res, next) => {
   
   const userId = req.user.id;
-  const { playerID, firstName, lastName, playerTeam } = req.body;
-  const player = { playerID, firstName, lastName, playerTeam };
+  const { playerPic, playerID, playerName, playerTeam, playerPosition } = req.body;
+  const requestedPlayer = { playerPic, playerID, playerName, playerTeam, playerPosition };
 
-  User.findByIdAndUpdate({ _id: userId }, { $push: {team: player}}, { new: true })
+  League.findOne({ 'users.userId': userId })
+    .then(league => {
+      if (league.players.find(player => player.playerID === requestedPlayer.playerID)) {
+        let err = new Error(`${requestedPlayer.playerName} was drafted already in this league; please choose another player.`);
+        err.status = 409;
+        return next(err);
+      }
+      else {
+        league.players.push(requestedPlayer);
+        league.save();
+      }
+    })
+    .then(() => User.findByIdAndUpdate({ _id: userId }, { $push: {team: requestedPlayer}}, { new: true }))
     .then(user => {
       res.json(user);
     })
