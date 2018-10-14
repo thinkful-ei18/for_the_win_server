@@ -47,7 +47,7 @@ router.get('/players', (req, res, next) => {
       return response.json();
     })
     .then(data => {
-      const currentlySignedPlayers = data.players.filter(player => player.teamAsOfDate !== null);
+      const currentlySignedPlayers = data.players.filter(playerObj => playerObj.player.currentRosterStatus === 'ROSTER' && playerObj.player.currentTeam && playerObj.player.jerseyNumber !== null);
 
       const selectablePlayers = currentlySignedPlayers.map(obj => {
         const playerPic = obj.player.officialImageSrc;
