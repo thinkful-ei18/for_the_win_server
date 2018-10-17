@@ -24,7 +24,7 @@ router.get('/', jwtAuth, (req, res, next) => {
 });
 
 
-/* ========== ADD TO A USER'S TEAM ========== */
+/* ========== ADD TO A USER'S TEAM AND TO THEIR LEAGUE ========== */
 router.put('/add', jwtAuth, (req, res, next) => {
   
   const userId = req.user.id;
@@ -45,22 +45,26 @@ router.put('/add', jwtAuth, (req, res, next) => {
     })
     .then(() => User.findByIdAndUpdate({ _id: userId }, { $push: {team: requestedPlayer}}, { new: true }))
     .then(user => {
+      
       res.json(user);
     })
     .catch(next);
 });
 
 
-/* ========== REMOVE FROM A USER'S TEAM ========== */
+/* ========== REMOVE FROM A USER'S TEAM AND FROM THEIR LEAGUE ========== */
 router.put('/remove', jwtAuth, (req, res, next) => {
 
   const userId = req.user.id;
   const { playerID } = req.body;
+  console.log('PLAYER ID:', playerID);
+  console.log('ID:', userId);
 
-  User.findByIdAndUpdate({ _id: userId }, {$pull: {team: {playerID }} }, { new: true })
-    .then(user => {
-      res.json(user);
-    })
+  League.findOneAndUpdate({ 'users.userId': userId }, {$pull: {players: { playerID }} }, { new: true })
+    .then(() => User.findByIdAndUpdate({ _id: userId }, {$pull: {team: { playerID }} }, { new: true })
+      .then(user => {
+        res.json(user);
+      }))
     .catch(next);
 });
 
