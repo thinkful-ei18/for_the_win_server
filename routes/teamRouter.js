@@ -57,8 +57,6 @@ router.put('/remove', jwtAuth, (req, res, next) => {
 
   const userId = req.user.id;
   const { playerID } = req.body;
-  console.log('PLAYER ID:', playerID);
-  console.log('ID:', userId);
 
   League.findOneAndUpdate({ 'users.userId': userId }, {$pull: {players: { playerID }} }, { new: true })
     .then(() => User.findByIdAndUpdate({ _id: userId }, {$pull: {team: { playerID }} }, { new: true })
