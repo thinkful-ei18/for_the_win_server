@@ -46,7 +46,7 @@ router.post('/add', jwtAuth, (req, res, next) => {
 
       return League.create({
         name: name.toLowerCase(),
-        users: [{ 
+        managers: [{ 
           userId: user.id,
           username: user.username,
           team: user.teamName
@@ -90,7 +90,7 @@ router.put('/join', jwtAuth, (req, res, next) => {
           return League.findOneAndUpdate(
             { name: name.toLowerCase() }, 
             { $push: 
-              { users: { 
+              { managers: { 
                 userId: user.id,
                 username: user.username,
                 team: user.teamName
