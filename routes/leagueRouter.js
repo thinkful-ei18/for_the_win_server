@@ -55,7 +55,10 @@ router.post('/add', jwtAuth, (req, res, next) => {
     })
     .then(league => {
 
-      User.findByIdAndUpdate(user.id, { leagueName: league.name}).then(user => user);
+      User.findByIdAndUpdate(user.id, { 
+        leagueName: league.name
+      })
+        .then(user => user);
 
       return res.status(201).location(`${req.originalUrl}/${league.id}`).json(league.return());
     })
@@ -78,11 +81,12 @@ router.put('/join', jwtAuth, (req, res, next) => {
 
   League.find({name: name.toLowerCase()})
     .then(league => {
-      const verify = league[0].users.filter(obj => obj.userId === user.id); 
+      const isThisUserAlreadyInThisLeague = league[0].users.filter(obj => obj.userId === user.id); 
 
-      if (verify.length < 1) {
+      if (isThisUserAlreadyInThisLeague.length < 1) {
 
         if(league[0].users.length <= 4) {
+
           return League.findOneAndUpdate(
             { name: name.toLowerCase() }, 
             { $push: 
