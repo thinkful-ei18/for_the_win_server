@@ -18,6 +18,10 @@ const leagueSchema = new Schema({
     type: Array,
     required: true,
     default: []
+  },
+  draftSchedule: {
+    type: Date,
+    default: ''
   }
 });
 
@@ -35,7 +39,8 @@ leagueSchema.methods.return = function () {
   return {
     name: this.name,
     managers: this.managers,
-    players: this.players
+    players: this.players,
+    draftSchedule: this.draftSchedule
   };
 };
 
