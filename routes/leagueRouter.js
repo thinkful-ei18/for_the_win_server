@@ -81,7 +81,7 @@ router.put('/join', jwtAuth, (req, res, next) => {
 
   League.find({name: name.toLowerCase()})
     .then(league => {
-      const isThisUserAlreadyInThisLeague = league[0].users.filter(obj => obj.userId === user.id); 
+      const isThisUserAlreadyInThisLeague = league[0].managers.filter(obj => obj.userId === user.id); 
 
       if (isThisUserAlreadyInThisLeague.length < 1) {
 
@@ -96,7 +96,7 @@ router.put('/join', jwtAuth, (req, res, next) => {
                 team: user.teamName
               }}
             }, 
-            { new: true }
+            { new: true }``
           );
         }
         else {
@@ -124,6 +124,20 @@ router.put('/join', jwtAuth, (req, res, next) => {
 });
 
 
+/* ========== SET DRAFT SCHEDULE FOR USER'S LEAGUE ========== */
+router.post('/schedule', jwtAuth, (req, res, next) => {
+  console.log('trying to set the schedule...');
+  const { name, draftSchedule } = req.body;
+
+  console.log('name:', name);
+  console.log('DS:', draftSchedule);
+
+  League.findOneAndUpdate({ name }, { draftSchedule }, {upsert: true, new: true})
+    .then(league => res.json(league))
+    .catch(err => next(err));
+});
+
+
 /* ========== RETRIEVE USER'S LEAGUE ========== */
 // returns an array with one object
 // this path has to be at the bottom, otherwise the '/add' & '/join' paths will match it.
@@ -135,5 +149,7 @@ router.get('/:name', jwtAuth, (req, res, next) => {
     .catch(err => next(err));
 
 });
+
+
 
 module.exports = router;
